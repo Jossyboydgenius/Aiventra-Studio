@@ -198,7 +198,7 @@ function About() {
 const SERVICES = [
   { icon: Globe, title: "Websites", desc: "Marketing sites, e-commerce and brand experiences built for speed and conversion." },
   { icon: Layers, title: "SaaS Platforms", desc: "End-to-end product engineering — from MVP to scale. Stripe, auth, dashboards." },
-  { icon: Wordpress, title: "WordPress", desc: "Custom themes, headless setups and lightning-fast managed migrations." },
+  { icon: FileCode, title: "WordPress", desc: "Custom themes, headless setups and lightning-fast managed migrations." },
   { icon: Smartphone, title: "Mobile Apps", desc: "Native iOS & Android and cross-platform React Native apps users love." },
   { icon: Monitor, title: "Desktop Apps", desc: "Electron and Tauri apps for Mac, Windows and Linux — production-grade." },
   { icon: Gamepad2, title: "Unity Games", desc: "2D & 3D Unity titles, shaders, multiplayer systems and Steam shipping." },
