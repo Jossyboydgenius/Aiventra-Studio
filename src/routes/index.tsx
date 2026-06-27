@@ -9,7 +9,7 @@ import {
   Monitor,
   Gamepad2,
   Bot,
-  Wordpress,
+  FileCode,
   Check,
   Mail,
   MapPin,
