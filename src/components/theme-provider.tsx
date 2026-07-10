@@ -1,3 +1,5 @@
+"use client";
+
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 export type Theme = "light" | "dark" | "gold";
@@ -35,12 +37,40 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     document.documentElement.setAttribute("data-theme", t);
     localStorage.setItem(STORAGE_KEY, choice);
 
+    // Dynamic favicon updates based on resolved theme
+    const faviconUrl = t === "gold" ? "/favicon-gold.ico" : "/favicon-blue.ico";
+    const faviconLinks = document.querySelectorAll("link[rel*='icon']");
+    if (faviconLinks.length > 0) {
+      faviconLinks.forEach((link) => {
+        const linkEl = link as HTMLLinkElement;
+        linkEl.href = faviconUrl;
+        linkEl.setAttribute("sizes", "256x256");
+        linkEl.setAttribute("type", "image/x-icon");
+      });
+    } else {
+      const link = document.createElement("link");
+      link.rel = "icon";
+      link.href = faviconUrl;
+      link.setAttribute("sizes", "256x256");
+      link.setAttribute("type", "image/x-icon");
+      document.head.appendChild(link);
+    }
+
     if (choice === "system") {
       const mq = window.matchMedia("(prefers-color-scheme: light)");
       const handler = () => {
         const nt = mq.matches ? "light" : "dark";
         setTheme(nt);
         document.documentElement.setAttribute("data-theme", nt);
+
+        // Update favicon for system resolution change
+        const systemLinks = document.querySelectorAll("link[rel*='icon']");
+        systemLinks.forEach((link) => {
+          const linkEl = link as HTMLLinkElement;
+          linkEl.href = "/favicon-blue.ico";
+          linkEl.setAttribute("sizes", "256x256");
+          linkEl.setAttribute("type", "image/x-icon");
+        });
       };
       mq.addEventListener("change", handler);
       return () => mq.removeEventListener("change", handler);

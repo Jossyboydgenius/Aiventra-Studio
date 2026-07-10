@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
 import { Sun, Moon, Crown, Monitor, Check } from "lucide-react";
 import { useTheme, type ThemeChoice } from "./theme-provider";
