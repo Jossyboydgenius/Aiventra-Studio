@@ -4,9 +4,10 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, Mail, Phone, MapPin, Linkedin, Twitter, Facebook } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
-import { ThemeToggle } from "@/components/theme-toggle";
+// ThemeToggle hidden — theme follows OS system preference automatically
+// import { ThemeToggle } from "@/components/theme-toggle";
 import logoBlue from "@/assets/logo-blue.png";
-import logoGold from "@/assets/logo-gold.png";
+// import logoGold from "@/assets/logo-gold.png"; // gold disabled
 import heroBlue from "@/assets/aiventra-logo-blue.png";
 import heroBlueLight from "@/assets/aiventra-logo-blue-light.png";
 
@@ -14,9 +15,8 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 export default function TermsAndConditions() {
   const { theme } = useTheme();
-  const logoSrc = theme === "gold" ? logoGold.src : logoBlue.src;
-  const footerSrc =
-    theme === "light" ? heroBlueLight.src : theme === "gold" ? logoGold.src : logoBlue.src;
+  const logoSrc = logoBlue.src; // gold disabled
+  const footerSrc = theme === "light" ? heroBlueLight.src : logoBlue.src;
 
   const footerLogoClass =
     theme === "light" ? "h-22 md:h-25 w-auto object-contain" : "h-16 md:h-18 w-auto object-contain";
@@ -38,7 +38,8 @@ export default function TermsAndConditions() {
           <span className="font-display font-medium text-lg hidden sm:inline">Aiventra Studio</span>
         </Link>
         <div className="flex items-center gap-3">
-          <ThemeToggle />
+          {/* ThemeToggle hidden — theme follows OS system preference automatically */}
+          {/* <ThemeToggle /> */}
           <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-surface transition-colors"
