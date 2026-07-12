@@ -281,7 +281,6 @@ function Hero() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       >
-
         <HeroLogo />
 
         <h1 className="font-display text-5xl sm:text-7xl md:text-[5.5rem] font-medium leading-[0.95] tracking-tighter max-w-5xl">
