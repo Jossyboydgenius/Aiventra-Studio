@@ -1,13 +1,18 @@
 "use client";
 
+// ThemeToggle is currently commented out from the navbar.
+// The site now follows the system (OS) dark/light preference automatically.
+// Re-enable this component + its usage in the Navbar when you want to give
+// users a manual override again.
+
 import { useEffect, useRef, useState } from "react";
-import { Sun, Moon, Crown, Monitor, Check } from "lucide-react";
+import { Sun, Moon, /* Crown, */ Monitor, Check } from "lucide-react";
 import { useTheme, type ThemeChoice } from "./theme-provider";
 
 const OPTIONS: { value: ThemeChoice; label: string; icon: typeof Sun }[] = [
   { value: "light", label: "Light", icon: Sun },
   { value: "dark", label: "Dark", icon: Moon },
-  { value: "gold", label: "Gold", icon: Crown },
+  // { value: "gold", label: "Gold", icon: Crown },  // Gold theme disabled for now
   { value: "system", label: "System", icon: Monitor },
 ];
 
@@ -24,7 +29,8 @@ export function ThemeToggle() {
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
-  const ActiveIcon = theme === "light" ? Sun : theme === "gold" ? Crown : Moon;
+  // Gold icon removed from active icon list
+  const ActiveIcon = theme === "light" ? Sun : Moon;
 
   return (
     <div ref={ref} className="relative">
