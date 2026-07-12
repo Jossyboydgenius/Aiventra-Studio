@@ -5,9 +5,10 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, Plus, X, Layers, Search, RotateCcw } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
-import { ThemeToggle } from "@/components/theme-toggle";
+// ThemeToggle hidden — theme follows OS system preference automatically
+// import { ThemeToggle } from "@/components/theme-toggle";
 import logoBlue from "@/assets/logo-blue.png";
-import logoGold from "@/assets/logo-gold.png";
+// import logoGold from "@/assets/logo-gold.png"; // gold disabled
 import confetti from "canvas-confetti";
 
 // Define project components (like PC components)
@@ -396,10 +397,9 @@ export default function BuildPage() {
 
   // Confetti trigger
   const triggerConfetti = () => {
-    const activeColors =
-      theme === "gold"
-        ? ["#f59e0b", "#d97706", "#fbbf24", "#fef3c7", "#f97316"]
-        : ["#0ea5e9", "#2563eb", "#3b82f6", "#06b6d4", "#e0f2fe"];
+    // Gold disabled — always use blue confetti
+    const activeColors = ["#0ea5e9", "#2563eb", "#3b82f6", "#06b6d4", "#e0f2fe"];
+    // gold: ["#f59e0b", "#d97706", "#fbbf24", "#fef3c7", "#f97316"]
 
     confetti({
       particleCount: 160,
@@ -454,7 +454,7 @@ export default function BuildPage() {
     (key) => selections[key] !== "none",
   ).length;
 
-  const logoSrc = theme === "gold" ? logoGold.src : logoBlue.src;
+  const logoSrc = logoBlue.src; // gold disabled: theme === "gold" ? logoGold.src : logoBlue.src
 
   return (
     <div className="min-h-screen bg-background text-foreground relative pb-12 overflow-visible">
@@ -473,7 +473,8 @@ export default function BuildPage() {
           <span className="font-display font-medium text-lg hidden sm:inline">Aiventra Studio</span>
         </Link>
         <div className="flex items-center gap-3">
-          <ThemeToggle />
+          {/* ThemeToggle hidden — theme follows OS system preference automatically */}
+          {/* <ThemeToggle /> */}
           <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-surface transition-colors"
