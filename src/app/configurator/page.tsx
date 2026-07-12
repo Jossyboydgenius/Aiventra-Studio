@@ -24,7 +24,8 @@ import {
   X,
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
-import { ThemeToggle } from "@/components/theme-toggle";
+// ThemeToggle hidden — theme follows OS system preference automatically
+// import { ThemeToggle } from "@/components/theme-toggle";
 import confetti from "canvas-confetti";
 
 // Dynamic palettes hex colors
@@ -200,10 +201,9 @@ export default function ConfiguratorPage() {
   const [submitted, setSubmitted] = useState(false);
 
   const triggerConfetti = () => {
-    const activeColors =
-      theme === "gold"
-        ? ["#f59e0b", "#d97706", "#fbbf24", "#fef3c7", "#f97316"]
-        : ["#0ea5e9", "#2563eb", "#3b82f6", "#06b6d4", "#e0f2fe"];
+    // Gold disabled — always use blue confetti
+    const activeColors = ["#0ea5e9", "#2563eb", "#3b82f6", "#06b6d4", "#e0f2fe"];
+    // gold: ["#f59e0b", "#d97706", "#fbbf24", "#fef3c7", "#f97316"]
 
     confetti({
       particleCount: 150,
@@ -269,7 +269,8 @@ export default function ConfiguratorPage() {
           </span>
         </Link>
         <div className="flex items-center gap-3">
-          <ThemeToggle />
+          {/* ThemeToggle hidden — theme follows OS system preference automatically */}
+          {/* <ThemeToggle /> */}
           <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-surface transition-colors"
