@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import confetti from "canvas-confetti";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   motion,
   useInView,
@@ -116,8 +116,8 @@ const NAV = [
 function Logo() {
   const { theme } = useTheme();
 
-  // Header Logo dynamic selection: Gold uses gold logo, Blue/Light use blue logo
-  const src = theme === "gold" ? logoGold.src : logoBlue.src;
+  // Gold disabled — always use blue logo
+  const src = logoBlue.src;
 
   return <img src={src} alt="Aiventra Studios" className="h-9 md:h-10 w-auto object-contain" />;
 }
@@ -129,9 +129,8 @@ interface HeroLogoProps {
 function HeroLogo({ className }: HeroLogoProps) {
   const { theme } = useTheme();
 
-  // Hero section Logo dynamic selection
-  const src =
-    theme === "gold" ? heroGold.src : theme === "light" ? heroBlueLight.src : heroBlue.src;
+  // Gold disabled — light uses heroBlueLight, dark uses heroBlue
+  const src = theme === "light" ? heroBlueLight.src : heroBlue.src;
 
   const defaultClass =
     theme === "light" ? "h-16 md:h-20 w-auto object-contain" : "h-38 md:h-42 w-auto object-contain";
@@ -197,7 +196,8 @@ function Header() {
           })}
         </nav>
         <div className="flex items-center gap-2">
-          <ThemeToggle />
+          {/* ThemeToggle hidden — theme follows OS system preference automatically */}
+          {/* <ThemeToggle /> */}
           <a
             href="#contact"
             className="hidden md:inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-primary-foreground transition-all hover:opacity-90 whitespace-nowrap"
@@ -281,10 +281,6 @@ function Hero() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       >
-        <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-          <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse" />
-          <span>Partner teams • One studio</span>
-        </div>
 
         <HeroLogo />
 
@@ -364,6 +360,217 @@ function SectionLabel({ children }: { children: string }) {
   );
 }
 
+// ─── Interactive Team Marquee ────────────────────────────────────────────────
+// Supports:
+//  • Auto-scroll (pauses while user interacts)
+//  • Mouse drag-to-scroll on desktop
+//  • Touch swipe on mobile
+//  • Click/tap to reveal LinkedIn link on mobile
+function TeamMemberCard({ member, index }: { member: (typeof TEAM)[number]; index: number }) {
+  const [tapped, setTapped] = useState(false);
+
+  // On mobile, tapping reveals the LinkedIn button; tapping again hides it.
+  // On desktop the hover CSS handles it natively.
+  const handleTap = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    // Only intercept touch interactions — let pure mouse clicks on LinkedIn
+    // anchor propagate normally.
+    const isTouchDevice = window.matchMedia("(hover: none)").matches;
+    if (!isTouchDevice) return;
+    e.preventDefault();
+    setTapped((prev) => !prev);
+  }, []);
+
+  return (
+    <div
+      key={`card-${index}`}
+      onClick={handleTap}
+      className="relative overflow-hidden rounded-2xl border border-border/30 bg-card flex flex-col justify-end p-6 group aspect-[3/4] w-[220px] sm:w-[260px] shrink-0 select-none cursor-grab active:cursor-grabbing touch-pan-x"
+    >
+      <img
+        src={member.image.src}
+        alt={member.name}
+        draggable={false}
+        className="absolute inset-0 h-full w-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out pointer-events-none"
+      />
+
+      {/* LinkedIn icon — visible on hover (desktop) OR when tapped (mobile) */}
+      <a
+        href={member.linkedin}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(e) => e.stopPropagation()}
+        aria-label={`View ${member.name} on LinkedIn`}
+        className={[
+          "absolute top-4 right-4 z-30 p-2 text-white bg-black/60 border border-white/20 rounded-full",
+          "hover:bg-primary transition-all duration-300 shadow-md",
+          // Desktop: shown on group-hover; Mobile: shown when tapped
+          tapped
+            ? "opacity-100 scale-100"
+            : "opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100",
+        ].join(" ")}
+      >
+        <Linkedin className="h-4 w-4" />
+      </a>
+
+      {/* Bottom gradient vignette */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent pointer-events-none z-10" />
+
+      {/* Name + role */}
+      <div
+        className={[
+          "relative z-20 text-center transition-transform duration-500 ease-out",
+          tapped ? "translate-y-0" : "translate-y-3 group-hover:translate-y-0",
+        ].join(" ")}
+      >
+        <h4 className="font-display text-xl font-medium text-white drop-shadow">{member.name}</h4>
+        <p
+          className={[
+            "text-xs text-white/80 font-medium tracking-wide mt-1.5 transition-opacity duration-500",
+            tapped ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+          ].join(" ")}
+        >
+          {member.role}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function TeamMarquee() {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
+  // Accumulated pixel offset (we animate translateX via this)
+  const offsetRef = useRef(0);
+  // Auto-scroll speed (px per frame at 60fps)
+  const SPEED = 0.5;
+  // Whether the user is actively dragging / touching
+  const isDragging = useRef(false);
+  const lastX = useRef(0);
+  const touchStartX = useRef(0);
+  const touchLastX = useRef(0);
+
+  // Apply the current offset to the DOM element directly (no React re-render
+  // needed — this keeps it smooth).
+  const applyOffset = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    // The track contains two identical sets of cards.  We measure the width of
+    // one set (half of scrollWidth) and loop once we've scrolled that far.
+    const halfW = el.scrollWidth / 2;
+    // Keep offset in [0, halfW) so the loop is invisible.
+    offsetRef.current = ((offsetRef.current % halfW) + halfW) % halfW;
+    el.style.transform = `translateX(-${offsetRef.current}px)`;
+  }, []);
+
+  // Auto-scroll RAF loop
+  useEffect(() => {
+    const tick = () => {
+      if (!isDragging.current) {
+        offsetRef.current += SPEED;
+        applyOffset();
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [applyOffset]);
+
+  // ── Mouse drag handlers ──────────────────────────────────────────────────
+  const onMouseDown = (e: React.MouseEvent) => {
+    isDragging.current = true;
+    lastX.current = e.clientX;
+    // Change cursor on the wrapper via class added to body
+    document.body.style.cursor = "grabbing";
+    document.body.style.userSelect = "none";
+  };
+
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current) return;
+      const delta = lastX.current - e.clientX;
+      lastX.current = e.clientX;
+      offsetRef.current += delta;
+      applyOffset();
+    };
+    const onMouseUp = () => {
+      isDragging.current = false;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+  }, [applyOffset]);
+
+  // ── Touch handlers ───────────────────────────────────────────────────────
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchLastX.current = e.touches[0].clientX;
+    isDragging.current = true;
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging.current) return;
+    const delta = touchLastX.current - e.touches[0].clientX;
+    touchLastX.current = e.touches[0].clientX;
+    offsetRef.current += delta;
+    applyOffset();
+  };
+
+  const onTouchEnd = () => {
+    isDragging.current = false;
+  };
+
+  return (
+    <div
+      className="relative w-full overflow-hidden py-4 border-y border-border/20 bg-surface/30"
+      // pause auto-scroll on hover (desktop)
+      onMouseEnter={() => {
+        isDragging.current = true;
+      }}
+      onMouseLeave={() => {
+        isDragging.current = false;
+      }}
+      onMouseDown={onMouseDown}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      style={{ cursor: "grab" }}
+    >
+      {/* Left fade mask */}
+      <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+      {/* Right fade mask */}
+      <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+
+      {/* Scrollable track — two copies for seamless infinite loop */}
+      <div
+        ref={trackRef}
+        className="flex w-max gap-4 sm:gap-6 px-4 will-change-transform"
+        style={{ transform: "translateX(0px)" }}
+      >
+        {/* First copy */}
+        {TEAM.map((m, i) => (
+          <TeamMemberCard key={`a-${i}`} member={m} index={i} />
+        ))}
+        {/* Second copy for seamless loop */}
+        {TEAM.map((m, i) => (
+          <TeamMemberCard key={`b-${i}`} member={m} index={i} />
+        ))}
+      </div>
+
+      {/* Scroll hint on mobile */}
+      <p className="sm:hidden text-center text-[10px] text-muted-foreground/50 mt-2 pointer-events-none">
+        Swipe to explore · Tap a card to see LinkedIn
+      </p>
+    </div>
+  );
+}
+
 function About() {
   return (
     <section id="about" className="section-padding relative overflow-hidden">
@@ -409,85 +616,8 @@ function About() {
         </motion.div>
       </div>
 
-      {/* Infinite scrolling team marquee */}
-      <div className="relative w-full overflow-hidden py-4 border-y border-border/20 bg-surface/30">
-        {/* Left fade mask */}
-        <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-48 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-        {/* Right fade mask */}
-        <div className="absolute right-0 top-0 bottom-0 w-24 sm:w-48 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
-
-        <div className="flex w-max gap-6 px-6 animate-marquee hover:[animation-play-state:paused] cursor-pointer">
-          {/* First loop */}
-          {TEAM.map((m) => (
-            <div
-              key={m.name}
-              className="relative overflow-hidden rounded-2xl border border-border/30 bg-card flex flex-col justify-end p-6 group aspect-[3/4] w-[280px]"
-            >
-              <img
-                src={m.image.src}
-                alt={m.name}
-                className="absolute inset-0 h-full w-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-              />
-              {/* LinkedIn hover icon button */}
-              <a
-                href={m.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute top-4 right-4 z-30 p-2 text-white bg-black/60 border border-white/20 rounded-full opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 hover:bg-primary transition-all duration-300 shadow-md"
-              >
-                <Linkedin className="h-3.5 w-3.5" />
-              </a>
-
-              {/* Vignette bottom dark overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent pointer-events-none z-10 transition-opacity duration-300 group-hover:opacity-90" />
-
-              <div className="relative z-20 text-center transform translate-y-3 group-hover:translate-y-0 transition-transform duration-500 ease-out">
-                <h4 className="font-display text-xl font-medium text-white drop-shadow">
-                  {m.name}
-                </h4>
-                <p className="text-xs text-white/80 font-medium tracking-wide mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out">
-                  {m.role}
-                </p>
-              </div>
-            </div>
-          ))}
-
-          {/* Second loop for seamless scroll */}
-          {TEAM.map((m) => (
-            <div
-              key={`${m.name}-dup`}
-              className="relative overflow-hidden rounded-2xl border border-border/30 bg-card flex flex-col justify-end p-6 group aspect-[3/4] w-[280px]"
-            >
-              <img
-                src={m.image.src}
-                alt={m.name}
-                className="absolute inset-0 h-full w-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-              />
-              {/* LinkedIn hover icon button */}
-              <a
-                href={m.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute top-4 right-4 z-30 p-2 text-white bg-black/60 border border-white/20 rounded-full opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 hover:bg-primary transition-all duration-300 shadow-md"
-              >
-                <Linkedin className="h-3.5 w-3.5" />
-              </a>
-
-              {/* Vignette bottom dark overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent pointer-events-none z-10 transition-opacity duration-300 group-hover:opacity-90" />
-
-              <div className="relative z-20 text-center transform translate-y-3 group-hover:translate-y-0 transition-transform duration-500 ease-out">
-                <h4 className="font-display text-xl font-medium text-white drop-shadow">
-                  {m.name}
-                </h4>
-                <p className="text-xs text-white/80 font-medium tracking-wide mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out">
-                  {m.role}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Interactive team marquee — drag/swipe/tap */}
+      <TeamMarquee />
     </section>
   );
 }
@@ -752,10 +882,6 @@ function Pricing() {
 
           <div className="relative z-10 grid gap-12 lg:grid-cols-2 lg:items-center">
             <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-                <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse" />
-                <span>Build Cost Estimator</span>
-              </div>
               <h3 className="font-display text-3xl md:text-4xl font-medium leading-tight">
                 Configure your custom project options in real-time
               </h3>
@@ -811,7 +937,7 @@ function Pricing() {
               </div>
 
               {/* Main Builder Window Mock */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-[55%] -translate-y-[52%] w-[88%] aspect-[4/3] bg-background border border-border/60 rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all scale-95 origin-center">
+              <div className="absolute top-1/2 left-1/2 -translate-x-[55%] -translate-y-[52%] w-[95%] aspect-[4/3] bg-background border border-border/60 rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all origin-center">
                 {/* Browser top-bar */}
                 <div className="bg-muted px-4 py-2.5 border-b border-border/40 flex items-center justify-between shrink-0 select-none">
                   <div className="flex items-center gap-1.5">
@@ -826,7 +952,7 @@ function Pricing() {
                 </div>
 
                 {/* Spec List Content */}
-                <div className="flex-grow p-4 space-y-3 font-mono text-[9px] sm:text-[10px] text-muted-foreground/90 overflow-y-auto">
+                <div className="flex-grow p-3 sm:p-4 space-y-3 font-mono text-[8px] sm:text-[10px] text-muted-foreground/90 overflow-y-auto whitespace-nowrap">
                   <div className="flex justify-between items-center bg-primary/5 border border-primary/20 p-2.5 rounded-xl text-foreground">
                     <div className="flex items-center gap-2">
                       <Check className="h-3.5 w-3.5 text-primary" />
@@ -862,7 +988,7 @@ function Pricing() {
               </div>
 
               {/* Overlapping Glassmorphism Invoice/Total Card */}
-              <div className="absolute bottom-6 right-2 sm:right-6 w-[62%] bg-card/85 backdrop-blur-xl border border-primary/30 p-4.5 rounded-2xl shadow-3xl space-y-3 scale-95 sm:scale-100 transition-all">
+              <div className="absolute bottom-6 right-1 sm:right-4 w-[72%] sm:w-[62%] bg-card/85 backdrop-blur-xl border border-primary/30 p-3 sm:p-4 rounded-2xl shadow-3xl space-y-2 sm:space-y-3 transition-all">
                 <div className="flex justify-between items-center">
                   <span className="text-[9px] uppercase tracking-wider font-semibold text-muted-foreground">
                     Your Estimate
@@ -1043,11 +1169,9 @@ function Contact() {
   /* eslint-enable @typescript-eslint/no-explicit-any, prefer-const, prefer-rest-params */
 
   const fireConfetti = (activeTheme: string) => {
-    // Select warm gold colors for gold theme; neon blues for default/cyan/light themes
-    const colors =
-      activeTheme === "gold"
-        ? ["#f59e0b", "#d97706", "#fbbf24", "#fef3c7", "#f97316"]
-        : ["#0ea5e9", "#2563eb", "#3b82f6", "#06b6d4", "#e0f2fe"];
+    // Gold disabled — always use blue confetti
+    const colors = ["#0ea5e9", "#2563eb", "#3b82f6", "#06b6d4", "#e0f2fe"];
+    // gold: ["#f59e0b", "#d97706", "#fbbf24", "#fef3c7", "#f97316"]
 
     // Primary burst
     confetti({
@@ -1290,9 +1414,6 @@ function CtaBanner() {
 
           <div className="relative z-10 flex flex-col items-center gap-8">
             <div className="space-y-4 max-w-3xl">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-3.5 py-1 text-xs uppercase tracking-widest text-primary font-medium">
-                Let's collaborate
-              </span>
               <h3 className="font-display text-4xl md:text-6xl font-medium leading-tight">
                 Have a vision? <br />
                 Let's{" "}
@@ -1324,9 +1445,8 @@ function CtaBanner() {
 function Footer() {
   const { theme } = useTheme();
 
-  // Footer Logo dynamic selection: Light uses hero banner, Gold uses logoGold, Blue uses logoBlue
-  const footerSrc =
-    theme === "light" ? heroBlueLight.src : theme === "gold" ? logoGold.src : logoBlue.src;
+  // Gold disabled — light uses hero banner, dark uses blue logo
+  const footerSrc = theme === "light" ? heroBlueLight.src : logoBlue.src;
 
   const footerLogoClass =
     theme === "light" ? "h-22 md:h-25 w-auto object-contain" : "h-16 md:h-18 w-auto object-contain";
