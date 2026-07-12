@@ -17,7 +17,8 @@ import {
   Bot,
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
-import { ThemeToggle } from "@/components/theme-toggle";
+// ThemeToggle hidden — theme follows OS system preference automatically
+// import { ThemeToggle } from "@/components/theme-toggle";
 
 // Tech cell assets
 import cellWa from "@/assets/cell-wa.png";
@@ -30,7 +31,7 @@ import cellMa from "@/assets/cell-ma.png";
 
 // Team member portraits logos
 import logoBlue from "@/assets/logo-blue.png";
-import logoGold from "@/assets/logo-gold.png";
+// import logoGold from "@/assets/logo-gold.png"; // gold disabled
 
 // Project assets
 import projectNimbus from "@/assets/project-nimbus.png";
@@ -256,8 +257,8 @@ export default function ServiceClient({ slug }: { slug: string }) {
   const data = SERVICES_DETAILS[slug];
   const { theme } = useTheme();
 
-  // Selected logo asset based on theme Choice
-  const logoSrc = theme === "gold" ? logoGold.src : logoBlue.src;
+  // Gold disabled — always use blue logo
+  const logoSrc = logoBlue.src;
 
   if (!data) {
     return (
@@ -295,7 +296,8 @@ export default function ServiceClient({ slug }: { slug: string }) {
           <img src={logoSrc} alt="Aiventra" className="h-9 md:h-10 w-auto object-contain" />
         </Link>
         <div className="flex items-center gap-4">
-          <ThemeToggle />
+          {/* ThemeToggle hidden — theme follows OS system preference automatically */}
+          {/* <ThemeToggle /> */}
           <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-semibold hover:bg-surface transition-colors"
