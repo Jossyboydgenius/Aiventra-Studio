@@ -109,6 +109,7 @@ const NAV = [
   { label: "About", href: "#about" },
   { label: "Services", href: "#services" },
   { label: "Portfolio", href: "#portfolio" },
+  { label: "Pricing", href: "/pricing" },
   { label: "Build Studio", href: "/build" },
   { label: "Contact", href: "#contact" },
 ];

@@ -1,17 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Plus, X, Layers, Search, RotateCcw } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  Plus,
+  X,
+  Layers,
+  Search,
+  RotateCcw,
+  Database,
+  TrendingUp,
+  Bot,
+  Activity,
+  Globe,
+  Zap,
+} from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
-// ThemeToggle hidden — theme follows OS system preference automatically
-// import { ThemeToggle } from "@/components/theme-toggle";
 import logoBlue from "@/assets/logo-blue.png";
-// import logoGold from "@/assets/logo-gold.png"; // gold disabled
 import confetti from "canvas-confetti";
 
-// Define project components (like PC components)
 interface ComponentOption {
   id: string;
   name: string;
@@ -27,303 +39,464 @@ interface ComponentCategory {
   options: ComponentOption[];
 }
 
+// 7 Categories Mapping the entire pricing document
 const COMPONENTS: ComponentCategory[] = [
   {
-    id: "platform",
-    name: "Base Platform",
+    id: "tier",
+    name: "Core Package Tier",
     icon: "layers",
     options: [
       {
-        id: "website",
-        name: "Corporate Website",
-        desc: "High-performance marketing & branding site with animations.",
-        price: 3000,
-        tags: ["Entry", "Best Value"],
-      },
-      {
-        id: "saas",
-        name: "SaaS Platform",
-        desc: "Complex dashboard workspace, analytics pipelines, & multi-tenant setups.",
-        price: 6000,
-        tags: ["Midrange", "Popular"],
-      },
-      {
-        id: "app",
-        name: "Mobile Application",
-        desc: "React Native iOS & Android application, optimized for store deployment.",
-        price: 8000,
-        tags: ["High Performance"],
-      },
-      {
-        id: "workflow",
-        name: "AI & Automation Workflow",
-        desc: "Intelligent background data pipelines, webhook setups, & chatbot integrations.",
-        price: 5000,
-        tags: ["Creator"],
-      },
-    ],
-  },
-  {
-    id: "design",
-    name: "Design Scope",
-    icon: "brush",
-    options: [
-      {
-        id: "none",
-        name: "No Design Needed",
-        desc: "We build directly from your existing Figma assets or wireframes.",
-        price: 0,
-        tags: ["Excluded"],
-      },
-      {
-        id: "standard-design",
-        name: "Standard Figma Design",
-        desc: "Custom wireframing, component libraries, & modern grid designs.",
-        price: 1200,
-        tags: ["Midrange", "Best Value"],
-      },
-      {
-        id: "complex-design",
-        name: "Premium Figma UX Architecture",
-        desc: "Full interactive layouts, advanced micro-interaction models, & style system files.",
-        price: 2500,
-        tags: ["Flagship"],
-      },
-      {
-        id: "branding",
-        name: "Custom Brand & Identity Assets",
-        desc: "Logo variations, vector shapes, type scale templates, & style guidelines.",
-        price: 800,
-        tags: ["Creator"],
-      },
-    ],
-  },
-  {
-    id: "pages",
-    name: "Pages / Screens Count",
-    icon: "file-text",
-    options: [
-      {
-        id: "none",
-        name: "Template Layout Only",
-        desc: "Single custom page frame or standard screen layout base.",
-        price: 0,
-        tags: ["Excluded"],
-      },
-      {
-        id: "pages-5",
-        name: "Up to 5 Custom Pages/Screens",
-        desc: "Custom crafted template routes and responsive media adapters.",
-        price: 1000,
+        id: "starter",
+        name: "Starter Package",
+        desc: "For new businesses: Landing page, basic website, contact forms, basic SEO.",
+        price: 500,
         tags: ["Entry"],
       },
       {
-        id: "pages-10",
-        name: "Up to 10 Custom Pages/Screens",
-        desc: "Complete site structure, secondary sub-pages, and user flows.",
-        price: 1800,
-        tags: ["Midrange", "Best Value"],
+        id: "standard",
+        name: "Standard Package",
+        desc: "For growing businesses: Multi-page website, CRM setup, automations, analytics, email integration.",
+        price: 2499,
+        tags: ["Growing"],
       },
       {
-        id: "pages-25",
-        name: "Up to 25 Custom Pages/Screens",
-        desc: "Broad information hub, multi-stage forms, or extensive mobile screens.",
-        price: 3500,
-        tags: ["High Performance", "Popular"],
+        id: "growth",
+        name: "Growth Package",
+        desc: "For scaling: Website + Funnel + CRM + Workflows + Lead Automation + Conversion Optimization.",
+        price: 5499,
+        tags: ["Scaling", "Popular"],
+      },
+      {
+        id: "professional",
+        name: "Professional Package",
+        desc: "Advanced systems: Everything in Growth plus custom integrations, dashboards, booking systems, AI automations.",
+        price: 10000,
+        tags: ["Systems", "Flagship"],
+      },
+      {
+        id: "enterprise",
+        name: "Enterprise Package",
+        desc: "Large organizations: Fully custom digital systems, multiple departments, dedicated support, SLAs, advanced security.",
+        price: 25000,
+        tags: ["Enterprise"],
+      },
+      {
+        id: "tripwire",
+        name: "Tripwire Audit Offer",
+        desc: "Entry offer: Website Audit, Funnel Audit, CRM Audit, UX Audit, Sales System Audit.",
+        price: 99,
+        tags: ["Audit Offer"],
       },
     ],
   },
   {
-    id: "database",
-    name: "Database & Auth Setup",
+    id: "crm-setup",
+    name: "CRM & Workflow Setup",
     icon: "database",
     options: [
       {
         id: "none",
-        name: "No Database Setup",
-        desc: "Static content build or third-party hosted content APIs.",
+        name: "No Add-on Selection",
+        desc: "Skip this add-on or use base package capabilities.",
         price: 0,
         tags: ["Excluded"],
       },
       {
-        id: "auth",
-        name: "User Auth & Profiles",
-        desc: "Secure credentials credentials, JWT tokens, Google/Apple OAuth login.",
-        price: 800,
-        tags: ["Midrange"],
+        id: "web-crm",
+        name: "Website & CRM Setup",
+        desc: "Integrated lead routing, contact organization, & pipeline setup ($500 – $2,000 range).",
+        price: 1250,
+        tags: ["Cross-Sell"],
       },
       {
-        id: "cloud-db",
-        name: "Supabase / PostgreSQL database",
-        desc: "Relational tables database design, real-time sync listeners, and security rules.",
+        id: "crm-workflow",
+        name: "CRM & Workflow Automation",
+        desc: "Advanced auto-assigns, workflow setups, & pipeline notification triggers ($500 – $2,500 range).",
         price: 1500,
-        tags: ["High Performance", "Popular"],
+        tags: ["Cross-Sell"],
       },
     ],
   },
   {
-    id: "payments",
-    name: "Payments Integration",
-    icon: "credit-card",
+    id: "funnels-marketing",
+    name: "Sales Funnel & Email Marketing",
+    icon: "trending-up",
     options: [
       {
         id: "none",
-        name: "No Checkout Integration",
-        desc: "Static pricing links or offline invoices.",
+        name: "No Add-on Selection",
+        desc: "Skip this add-on or use base package capabilities.",
         price: 0,
         tags: ["Excluded"],
       },
       {
-        id: "stripe",
-        name: "Stripe Checkout Setup",
-        desc: "Stripe Checkout form, billing portals, and basic billing logs.",
-        price: 1200,
-        tags: ["Midrange", "Best Value"],
+        id: "web-funnel",
+        name: "Website & Sales Funnel",
+        desc: "Interactive landing stages built to capture traffic and convert ($800 – $3,000 range).",
+        price: 1900,
+        tags: ["Cross-Sell"],
       },
       {
-        id: "subscription",
-        name: "Advanced Subscription Engine",
-        desc: "Stripe Webhooks, customer portal tier controls, discounts, & metered billing.",
-        price: 2200,
-        tags: ["Flagship"],
+        id: "funnel-email",
+        name: "Funnel & Email Marketing",
+        desc: "Drip campaigns, custom newsletter integration, and lead tags ($400 – $1,500 range).",
+        price: 950,
+        tags: ["Cross-Sell"],
       },
     ],
   },
   {
-    id: "chatbot",
-    name: "AI & Chatbot Setup",
+    id: "chatbot-booking",
+    name: "Booking Systems & AI Chatbots",
     icon: "bot",
     options: [
       {
         id: "none",
-        name: "No AI Integrations",
-        desc: "Standard contact forms and static layouts.",
+        name: "No Add-on Selection",
+        desc: "Skip this add-on or use base package capabilities.",
         price: 0,
         tags: ["Excluded"],
       },
       {
-        id: "basic-bot",
-        name: "Simple Rule-Based Widget",
-        desc: "Configured helpdesk floating widget with pre-defined Q&A paths.",
-        price: 800,
-        tags: ["Entry"],
+        id: "booking",
+        name: "Booking System Setup",
+        desc: "Calendar integration, booking page, and automatic invitation triggers.",
+        price: 200,
+        tags: ["Cross-Sell"],
       },
       {
-        id: "ai-agent",
-        name: "Advanced OpenAI/LLM Agent",
-        desc: "Intelligent agent trained on your docs with vector memory search.",
-        price: 2000,
-        tags: ["Flagship", "Popular"],
+        id: "chatbot",
+        name: "AI Chatbot Widget",
+        desc: "Rule-based chatbot widget custom-configured on pages ($800 – $2,000 range).",
+        price: 1400,
+        tags: ["Cross-Sell"],
       },
     ],
   },
   {
-    id: "crm",
-    name: "CRM & Analytics",
+    id: "conversion-cro",
+    name: "Conversion Optimization & Analytics",
     icon: "activity",
     options: [
       {
         id: "none",
-        name: "Basic Analytics Only",
-        desc: "Standard Google Analytics configuration.",
+        name: "No Add-on Selection",
+        desc: "Skip this add-on or use base package capabilities.",
         price: 0,
         tags: ["Excluded"],
       },
       {
-        id: "pixels",
-        name: "Advanced SEO & Meta Pixels",
-        desc: "Complete metadata grids, Schema tags, FB Pixel logging, and SEO checks.",
-        price: 600,
-        tags: ["Entry", "Best Value"],
+        id: "cro",
+        name: "Conversion Rate Optimization (CRO)",
+        desc: "Detailed page usability tracking, heatmap logging, & updates ($1,000 – $5,000 range).",
+        price: 3000,
+        tags: ["Upsell"],
       },
       {
-        id: "crm-pipeline",
-        name: "HubSpot / GHL CRM Automation",
-        desc: "Active API connection sync, contact forms logs, & automated email notification triggers.",
-        price: 1800,
-        tags: ["Midrange", "Popular"],
+        id: "analytics",
+        name: "Analytics Dashboard",
+        desc: "Centralized analytics reporting dashboard custom-integrated ($400 – $2,000 range).",
+        price: 1200,
+        tags: ["Upsell"],
+      },
+    ],
+  },
+  {
+    id: "seo-search",
+    name: "SEO Optimization Services",
+    icon: "globe",
+    options: [
+      {
+        id: "none",
+        name: "No Add-on Selection",
+        desc: "Skip this add-on or use base package capabilities.",
+        price: 0,
+        tags: ["Excluded"],
+      },
+      {
+        id: "seo",
+        name: "SEO Optimization Package",
+        desc: "In-depth keyword analysis, metadata structuring, Schema markups, & logs ($250 – $2,000 range).",
+        price: 1125,
+        tags: ["Upsell"],
+      },
+    ],
+  },
+  {
+    id: "advanced-automation",
+    name: "AI & Marketing Automation",
+    icon: "zap",
+    options: [
+      {
+        id: "none",
+        name: "No Add-on Selection",
+        desc: "Skip this add-on or use base package capabilities.",
+        price: 0,
+        tags: ["Excluded"],
+      },
+      {
+        id: "ai-support",
+        name: "AI Customer Support System",
+        desc: "Intelligent OpenAI customer support system with document search ($1,500 – $3,000 range).",
+        price: 2250,
+        tags: ["Upsell"],
+      },
+      {
+        id: "marketing-auto",
+        name: "Marketing Automation Systems",
+        desc: "Drip triggers, complex behavioral tracking workflows ($500 – $3,000 range).",
+        price: 1750,
+        tags: ["Upsell"],
       },
     ],
   },
 ];
 
+// Presets based on the new tiers
 const PRESETS = [
   {
-    name: "SaaS Launchpad",
-    desc: "Perfect start for modern software startups looking to build a high-converting web app.",
-    cost: "$12,100",
+    name: "Starter Pack",
+    desc: "Perfect start for new businesses looking for a simple, professional corporate layout.",
+    cost: "$500",
     selections: {
-      platform: "saas",
-      design: "standard-design",
-      pages: "pages-10",
-      database: "cloud-db",
-      payments: "stripe",
-      chatbot: "none",
-      crm: "pixels",
+      tier: "starter",
+      "crm-setup": "none",
+      "funnels-marketing": "none",
+      "chatbot-booking": "none",
+      "conversion-cro": "none",
+      "seo-search": "none",
+      "advanced-automation": "none",
     },
   },
   {
-    name: "Enterprise SaaS & AI",
-    desc: "Complete corporate layout with database backend, Stripe subscriptions, and AI agent automation.",
-    cost: "$18,300",
+    name: "Standard Package",
+    desc: "Complete Standard plan including integrated CRM Setup and basic automations.",
+    cost: "$3,749",
     selections: {
-      platform: "saas",
-      design: "complex-design",
-      pages: "pages-25",
-      database: "cloud-db",
-      payments: "subscription",
-      chatbot: "ai-agent",
-      crm: "crm-pipeline",
+      tier: "standard",
+      "crm-setup": "web-crm",
+      "funnels-marketing": "none",
+      "chatbot-booking": "none",
+      "conversion-cro": "none",
+      "seo-search": "none",
+      "advanced-automation": "none",
     },
   },
   {
-    name: "Marketing Corporate",
-    desc: "Clean website with standard figma styles, CMS backend, and Facebook/Google logging.",
-    cost: "$5,600",
+    name: "Growth Scale Pack",
+    desc: "Growth tier package with Sales Funnel, CRM workflows, and Conversion Optimization.",
+    cost: "$5,499",
     selections: {
-      platform: "website",
-      design: "standard-design",
-      pages: "pages-10",
-      database: "none",
-      payments: "none",
-      chatbot: "none",
-      crm: "pixels",
+      tier: "growth",
+      "crm-setup": "none",
+      "funnels-marketing": "none",
+      "chatbot-booking": "none",
+      "conversion-cro": "none",
+      "seo-search": "none",
+      "advanced-automation": "none",
     },
   },
   {
-    name: "Mobile App Hub",
-    desc: "iOS & Android build with security auth, standard figma design, and custom support widget.",
-    cost: "$11,800",
+    name: "Professional Suite",
+    desc: "Professional tier pack with AI Chatbot and custom Analytics Dashboard.",
+    cost: "$12,600",
     selections: {
-      platform: "app",
-      design: "standard-design",
-      pages: "pages-5",
-      database: "auth",
-      payments: "none",
-      chatbot: "basic-bot",
-      crm: "none",
+      tier: "professional",
+      "crm-setup": "none",
+      "funnels-marketing": "none",
+      "chatbot-booking": "chatbot",
+      "conversion-cro": "analytics",
+      "seo-search": "none",
+      "advanced-automation": "none",
     },
+  },
+];
+
+// Odometer counter hook — animates a number change like the landing page stats counters
+function useOdometer(value: number, duration = 600) {
+  const [display, setDisplay] = useState(value);
+  const prevRef = useRef(value);
+
+  useEffect(() => {
+    const start = prevRef.current;
+    const end = value;
+    if (start === end) return;
+    const startTime = performance.now();
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // cubic ease-out
+      setDisplay(Math.round(start + (end - start) * eased));
+      if (progress < 1) requestAnimationFrame(tick);
+      else prevRef.current = end;
+    };
+    requestAnimationFrame(tick);
+  }, [value, duration]);
+
+  return display;
+}
+
+// Grand total display with odometer animation
+function GrandTotalDisplay({ grandTotal }: { grandTotal: number }) {
+  const animatedTotal = useOdometer(grandTotal);
+  return (
+    <div className="border-t border-border/30 pt-4 flex flex-col gap-1">
+      <span className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground">
+        Estimated Upfront Cost
+      </span>
+      <span className="text-3xl font-bold tracking-tight text-gradient-primary">
+        ${animatedTotal.toLocaleString()}
+      </span>
+    </div>
+  );
+}
+
+// 6 Recurring / Care Plans with per-plan dynamic coverage info
+const CARE_PLANS = [
+  {
+    id: "none",
+    name: "No Retainer Plan",
+    desc: "Launch your system with standard 3-month bug monitoring included.",
+    priceDisplay: "Free",
+    price: 0,
+    recommended: false,
+    covered: [
+      "Launch bug fixes & monitoring",
+      "3-month post-launch support window",
+      "Initial deployment assistance",
+    ],
+    notCovered: [
+      "Ongoing maintenance after 3 months",
+      "Hosting & server support",
+      "SEO monitoring or analytics",
+      "Feature additions or updates",
+    ],
+  },
+  {
+    id: "care",
+    name: "Care Plan",
+    desc: "Hosting support, maintenance, backups, security, updates.",
+    priceDisplay: "$199/mo",
+    range: "($99\u2013$299/mo)",
+    price: 199,
+    recommended: false,
+    covered: [
+      "Hosting setups & server support",
+      "Safety backups & restores",
+      "Version & security updates",
+      "Security log monitoring",
+    ],
+    notCovered: [
+      "Complete layout design revamps",
+      "New feature development",
+      "Third-party license & database bills",
+      "SEO or analytics monitoring",
+    ],
+  },
+  {
+    id: "performance",
+    name: "Performance Plan",
+    desc: "Care Plan + SEO monitoring, analytics, minor updates.",
+    priceDisplay: "$175/mo",
+    range: "($100\u2013$250/mo)",
+    price: 175,
+    recommended: false,
+    covered: [
+      "All Care Plan features",
+      "SEO monitoring & checks",
+      "Analytics dashboard checkups",
+      "Minor layout adjustments",
+    ],
+    notCovered: [
+      "Major feature additions",
+      "Custom API integrations",
+      "Complete design overhauls",
+      "Extensive automation builds",
+    ],
+  },
+  {
+    id: "growth",
+    name: "Growth Partner",
+    desc: "Performance Plan + monthly optimization, new pages, automations, strategy calls.",
+    priceDisplay: "$1,400/mo",
+    range: "($300\u2013$2,500/mo)",
+    price: 1400,
+    recommended: true,
+    covered: [
+      "All Performance Plan features",
+      "Monthly UI optimizations",
+      "Additional pages & templates",
+      "Automation & workflow updates",
+      "Monthly strategy calls",
+    ],
+    notCovered: [
+      "Enterprise-level custom systems",
+      "Third-party tool license costs",
+      "Complete platform rebuilds",
+    ],
+  },
+  {
+    id: "revenue",
+    name: "Revenue Partner",
+    desc: "Complete premium management, funnel optimization, CRM improvements, AI enhancements.",
+    priceDisplay: "$6,250/mo",
+    range: "($2,500\u2013$10,000+/mo)",
+    price: 6250,
+    recommended: false,
+    covered: [
+      "All Growth Partner features",
+      "Complete premium management",
+      "Funnel & CRM optimization",
+      "AI enhancement updates",
+      "Conversion rate optimization",
+    ],
+    notCovered: ["Hard infrastructure costs", "Third-party tool license fees"],
+  },
+  {
+    id: "maintenance",
+    name: "Website Maintenance",
+    desc: "Regular updates, theme/plugin checks, speed optimizations.",
+    priceDisplay: "$300/mo",
+    range: "($100\u2013$500/mo)",
+    price: 300,
+    recommended: false,
+    covered: [
+      "Theme & plugin updates",
+      "Speed & performance optimization",
+      "Regular content updates",
+      "Basic security monitoring",
+    ],
+    notCovered: [
+      "New feature development",
+      "CRM or funnel work",
+      "Design overhauls",
+      "SEO strategy or analytics",
+    ],
   },
 ];
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-export default function BuildPage() {
+const BASE_TIERS_IDS = ["starter", "standard", "growth", "professional", "enterprise", "tripwire"];
+
+function BuildStudioContent() {
   const { theme } = useTheme();
+  const searchParams = useSearchParams();
 
   // Core Configurator Selections State
   const [selections, setSelections] = useState<Record<string, string>>({
-    platform: "website",
-    design: "none",
-    pages: "none",
-    database: "none",
-    payments: "none",
-    chatbot: "none",
-    crm: "none",
+    tier: "standard",
+    "crm-setup": "none",
+    "funnels-marketing": "none",
+    "chatbot-booking": "none",
+    "conversion-cro": "none",
+    "seo-search": "none",
+    "advanced-automation": "none",
   });
 
-  // Protection (Care) Plan: "included" | "care" | "pro"
-  const [carePlan, setCarePlan] = useState<"included" | "care" | "pro">("included");
+  // Protection (Care) Plan — uses CARE_PLANS ids
+  const [carePlan, setCarePlan] = useState<string>("none");
 
   // Payment Method: "full" | "milestone"
   const [paymentMethod, setPaymentMethod] = useState<"full" | "milestone">("full");
@@ -340,18 +513,26 @@ export default function BuildPage() {
   const [notes, setNotes] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
+  // Read URL query params on mount
+  useEffect(() => {
+    const preset = searchParams.get("preset");
+    if (preset && BASE_TIERS_IDS.includes(preset)) {
+      setSelections((prev) => ({ ...prev, tier: preset }));
+    }
+  }, [searchParams]);
+
   // Reset helper
   const handleReset = () => {
     setSelections({
-      platform: "website",
-      design: "none",
-      pages: "none",
-      database: "none",
-      payments: "none",
-      chatbot: "none",
-      crm: "none",
+      tier: "standard",
+      "crm-setup": "none",
+      "funnels-marketing": "none",
+      "chatbot-booking": "none",
+      "conversion-cro": "none",
+      "seo-search": "none",
+      "advanced-automation": "none",
     });
-    setCarePlan("included");
+    setCarePlan("none");
     setPaymentMethod("full");
   };
 
@@ -376,35 +557,29 @@ export default function BuildPage() {
   };
 
   const getCarePrice = () => {
-    if (carePlan === "care") return 1500;
-    if (carePlan === "pro") return 4000;
-    return 0;
+    const plan = CARE_PLANS.find((p) => p.id === carePlan);
+    return plan ? plan.price : 0;
   };
 
   const subtotal = getSubtotal();
   const careCost = getCarePrice();
 
-  // Calculate discount (10% off subtotal + care if pay in full)
+  // Calculate discount (10% off upfront subtotal if pay in full)
   const isPayInFull = paymentMethod === "full";
   const discountRate = isPayInFull ? 0.1 : 0.0;
-  const rawSubtotalPlusCare = subtotal + careCost;
-  const discount = Math.round(rawSubtotalPlusCare * discountRate);
+  const discount = Math.round(subtotal * discountRate);
 
   // VAT (7.5%) calculated on the discounted subtotal
-  const taxableAmount = rawSubtotalPlusCare - discount;
+  const taxableAmount = subtotal - discount;
   const vat = Math.round(taxableAmount * 0.075);
   const grandTotal = taxableAmount + vat;
 
   // Confetti trigger
   const triggerConfetti = () => {
-    // Gold disabled — always use blue confetti
-    const activeColors = ["#0ea5e9", "#2563eb", "#3b82f6", "#06b6d4", "#e0f2fe"];
-    // gold: ["#f59e0b", "#d97706", "#fbbf24", "#fef3c7", "#f97316"]
-
     confetti({
       particleCount: 160,
       spread: 90,
-      colors: activeColors,
+      colors: ["#0ea5e9", "#2563eb", "#3b82f6", "#06b6d4", "#e0f2fe"],
       zIndex: 10000,
     });
   };
@@ -454,7 +629,28 @@ export default function BuildPage() {
     (key) => selections[key] !== "none",
   ).length;
 
-  const logoSrc = logoBlue.src; // gold disabled: theme === "gold" ? logoGold.src : logoBlue.src
+  const getCategoryIcon = (iconName: string) => {
+    switch (iconName) {
+      case "layers":
+        return <Layers className="h-4 w-4 text-primary" />;
+      case "database":
+        return <Database className="h-4 w-4 text-primary" />;
+      case "trending-up":
+        return <TrendingUp className="h-4 w-4 text-primary" />;
+      case "bot":
+        return <Bot className="h-4 w-4 text-primary" />;
+      case "activity":
+        return <Activity className="h-4 w-4 text-primary" />;
+      case "globe":
+        return <Globe className="h-4 w-4 text-primary" />;
+      case "zap":
+        return <Zap className="h-4 w-4 text-primary" />;
+      default:
+        return <Layers className="h-4 w-4 text-primary" />;
+    }
+  };
+
+  const logoSrc = logoBlue.src;
 
   return (
     <div className="min-h-screen bg-background text-foreground relative pb-12 overflow-visible">
@@ -473,8 +669,6 @@ export default function BuildPage() {
           <span className="font-display font-medium text-lg hidden sm:inline">Aiventra Studio</span>
         </Link>
         <div className="flex items-center gap-3">
-          {/* ThemeToggle hidden — theme follows OS system preference automatically */}
-          {/* <ThemeToggle /> */}
           <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-surface transition-colors"
@@ -485,7 +679,7 @@ export default function BuildPage() {
       </motion.header>
 
       {/* Main Grid Workspace */}
-      <div className="pt-28 px-4 max-w-7xl mx-auto grid gap-6 lg:grid-cols-[1fr_320px] items-start relative z-10 overflow-visible">
+      <div className="pt-28 px-4 max-w-7xl mx-auto grid gap-6 lg:grid-cols-[1fr_340px] items-start relative z-10 overflow-visible">
         {/* LEFT COLUMN: Configurator workspace / selection views */}
         <div className="space-y-6">
           <AnimatePresence mode="wait">
@@ -564,7 +758,7 @@ export default function BuildPage() {
                           {/* Component column */}
                           <div className="space-y-1">
                             <div className="text-muted-foreground uppercase tracking-wider text-[10px] font-semibold flex items-center gap-1.5">
-                              <Layers className="h-3 w-3 text-primary" />
+                              {getCategoryIcon(cat.icon)}
                               {cat.name}
                             </div>
                             {selected && selected.id !== "none" ? (
@@ -649,7 +843,7 @@ export default function BuildPage() {
                 </div>
 
                 {/* Support & Maintenance (Aiventra Care) */}
-                <div className="card-elevated p-6 rounded-2xl space-y-4">
+                <div className="card-elevated p-6 rounded-2xl space-y-5">
                   <div>
                     <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
                       Protect Your Build • Aiventra Care
@@ -660,113 +854,81 @@ export default function BuildPage() {
                     </p>
                   </div>
 
-                  <div className="grid gap-4 md:grid-cols-3">
-                    {/* Standard included */}
-                    <div
-                      onClick={() => setCarePlan("included")}
-                      className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between ${
-                        carePlan === "included"
-                          ? "bg-primary/5 border-primary shadow-sm"
-                          : "border-border hover:border-primary/20"
-                      }`}
-                    >
-                      <div className="space-y-1">
-                        <span className="font-bold text-xs uppercase tracking-wider block">
-                          Standard
-                        </span>
-                        <p className="text-[10px] text-muted-foreground">
-                          3 months bugs & launch monitoring.
-                        </p>
-                      </div>
-                      <span className="font-bold text-sm text-foreground mt-4 block">Free</span>
-                    </div>
-
-                    {/* Care 1 year */}
-                    <div
-                      onClick={() => setCarePlan("care")}
-                      className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between ${
-                        carePlan === "care"
-                          ? "bg-primary/5 border-primary shadow-sm"
-                          : "border-border hover:border-primary/20"
-                      }`}
-                    >
-                      <div className="space-y-1">
-                        <span className="font-bold text-xs uppercase tracking-wider block">
-                          Aiventra Care
-                        </span>
-                        <p className="text-[10px] text-muted-foreground">
-                          12 months system monitoring & minor adjustments.
-                        </p>
-                      </div>
-                      <span className="font-bold text-sm text-primary mt-4 block">+$1,500</span>
-                    </div>
-
-                    {/* Care Pro 3 year */}
-                    <div
-                      onClick={() => setCarePlan("pro")}
-                      className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between relative overflow-hidden ${
-                        carePlan === "pro"
-                          ? "bg-primary/5 border-primary shadow-sm"
-                          : "border-border hover:border-primary/20"
-                      }`}
-                    >
-                      <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-bl-lg">
-                        Recommended
-                      </div>
-                      <div className="space-y-1">
-                        <span className="font-bold text-xs uppercase tracking-wider block">
-                          Aiventra Care Pro
-                        </span>
-                        <p className="text-[10px] text-muted-foreground">
-                          36 months priority bug fixes, SLA guarantee, and updates.
-                        </p>
-                      </div>
-                      <span className="font-bold text-sm text-primary mt-4 block">+$4,000</span>
-                    </div>
+                  {/* 6-Plan Grid */}
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {CARE_PLANS.map((plan) => {
+                      const isActive = carePlan === plan.id;
+                      return (
+                        <div
+                          key={plan.id}
+                          onClick={() => setCarePlan(plan.id)}
+                          className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between relative overflow-hidden ${
+                            isActive
+                              ? "bg-primary/5 border-primary shadow-sm"
+                              : "border-border hover:border-primary/20"
+                          }`}
+                        >
+                          {plan.recommended && (
+                            <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-bl-lg">
+                              Recommended
+                            </div>
+                          )}
+                          <div className="space-y-1">
+                            <span className="font-bold text-xs uppercase tracking-wider block pr-16">
+                              {plan.name}
+                            </span>
+                            <p className="text-[10px] text-muted-foreground leading-normal">
+                              {plan.desc}
+                            </p>
+                          </div>
+                          <div className="mt-4">
+                            <span className="font-bold text-sm text-primary block">
+                              {plan.priceDisplay}
+                            </span>
+                            {"range" in plan && (
+                              <span className="text-[9px] text-muted-foreground/70">
+                                {plan.range}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
 
-                  {/* Coverage details grid */}
-                  <div className="grid gap-6 md:grid-cols-2 pt-2 border-t border-border/20 text-xs">
-                    <div className="space-y-2">
-                      <span className="font-bold text-green-500 uppercase tracking-widest text-[9px] block">
-                        Covered
-                      </span>
-                      <ul className="space-y-1.5 text-muted-foreground text-[10px]">
-                        <li className="flex items-center gap-2">
-                          <Check className="h-3 w-3 text-green-500 shrink-0" /> Launch defects and
-                          component bugs
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Check className="h-3 w-3 text-green-500 shrink-0" /> API integration
-                          breaks and auth fixes
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Check className="h-3 w-3 text-green-500 shrink-0" /> Hosting server
-                          tuning (under SLA)
-                        </li>
-                      </ul>
-                    </div>
-
-                    <div className="space-y-2">
-                      <span className="font-bold text-red-500 uppercase tracking-widest text-[9px] block">
-                        Not Covered
-                      </span>
-                      <ul className="space-y-1.5 text-muted-foreground text-[10px]">
-                        <li className="flex items-center gap-2">
-                          <X className="h-3 w-3 text-red-500 shrink-0" /> Complete layout design
-                          revamps
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <X className="h-3 w-3 text-red-500 shrink-0" /> Third-party license and
-                          database bills
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <X className="h-3 w-3 text-red-500 shrink-0" /> Extensive feature
-                          additions
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
+                  {/* Dynamic Covered / Not Covered for selected plan */}
+                  {(() => {
+                    const selected = CARE_PLANS.find((p) => p.id === carePlan);
+                    if (!selected) return null;
+                    return (
+                      <div className="grid gap-6 md:grid-cols-2 pt-2 border-t border-border/20 text-xs">
+                        <div className="space-y-2">
+                          <span className="font-bold text-green-500 uppercase tracking-widest text-[9px] block">
+                            Covered
+                          </span>
+                          <ul className="space-y-1.5 text-muted-foreground text-[10px]">
+                            {selected.covered.map((item) => (
+                              <li key={item} className="flex items-center gap-2">
+                                <Check className="h-3 w-3 text-green-500 shrink-0" /> {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className="space-y-2">
+                          <span className="font-bold text-red-500 uppercase tracking-widest text-[9px] block">
+                            Not Covered
+                          </span>
+                          <ul className="space-y-1.5 text-muted-foreground text-[10px]">
+                            {selected.notCovered.map((item) => (
+                              <li key={item} className="flex items-center gap-2">
+                                <X className="h-3 w-3 text-red-500 shrink-0" /> {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* How would you like to pay */}
@@ -794,7 +956,7 @@ export default function BuildPage() {
                           Pay in full
                         </span>
                         <p className="text-[10px] text-muted-foreground">
-                          Receive a 10% discount on final subtotal & support.
+                          Receive a 10% discount on final upfront subtotal.
                         </p>
                       </div>
                       <span className="font-semibold text-xs text-primary mt-4 block">
@@ -991,7 +1153,7 @@ export default function BuildPage() {
         </div>
 
         {/* RIGHT COLUMN: Sticky Floating Sidebar Quote Panel */}
-        <aside className="lg:sticky lg:top-28 self-start space-y-6 w-full">
+        <aside className="lg:sticky lg:top-24 self-start space-y-6 w-full">
           <div className="relative overflow-hidden rounded-2xl p-5 border border-primary/20 bg-card shadow-lg flex flex-col justify-between">
             <div className="absolute -left-10 -top-10 w-24 h-24 rounded-full blur-2xl opacity-15 pointer-events-none bg-primary" />
 
@@ -1039,16 +1201,16 @@ export default function BuildPage() {
               {/* Estimate Cost List */}
               <div className="space-y-2.5 text-xs text-muted-foreground">
                 <div className="flex justify-between">
-                  <span>Components Subtotal</span>
+                  <span>Upfront Build Cost</span>
                   <span className="font-semibold text-foreground">
                     ${subtotal.toLocaleString()}
                   </span>
                 </div>
-                {careCost > 0 && (
+                {carePlan !== "none" && (
                   <div className="flex justify-between">
-                    <span>Aiventra Care Plan</span>
+                    <span>Care Plan /mo</span>
                     <span className="font-semibold text-foreground">
-                      ${careCost.toLocaleString()}
+                      {CARE_PLANS.find((p) => p.id === carePlan)?.priceDisplay}
                     </span>
                   </div>
                 )}
@@ -1059,23 +1221,13 @@ export default function BuildPage() {
                   </div>
                 )}
                 <div className="flex justify-between border-t border-border/10 pt-2.5">
-                  <span>Tax / VAT (7.5%)</span>
+                  <span>VAT (7.5%)</span>
                   <span className="font-semibold text-foreground">${vat.toLocaleString()}</span>
                 </div>
               </div>
 
-              {/* Grand Total */}
-              <div className="border-t border-border/30 pt-4 flex flex-col gap-1">
-                <span className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground">
-                  Estimated Build Cost
-                </span>
-                <span className="text-3xl font-bold tracking-tight text-gradient-primary">
-                  ${grandTotal.toLocaleString()}
-                </span>
-                <span className="text-[9px] text-muted-foreground">
-                  {isPayInFull ? "Paid in full upfront contract" : "Milestone layout splits"}
-                </span>
-              </div>
+              {/* Grand Total — odometer animation */}
+              <GrandTotalDisplay grandTotal={grandTotal} />
 
               {/* CTA button */}
               <div className="pt-2">
@@ -1148,95 +1300,68 @@ export default function BuildPage() {
 
                   <div className="space-y-3.5">
                     <div>
-                      <label className="block text-xs uppercase tracking-wider text-muted-foreground mb-1.5 font-medium">
-                        Your Name
+                      <label
+                        htmlFor="name-input"
+                        className="block text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1"
+                      >
+                        Full Name
                       </label>
                       <input
+                        id="name-input"
                         type="text"
                         required
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full bg-input border border-border px-3.5 py-2.5 rounded-xl text-xs focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium"
-                        placeholder="Enter name"
+                        placeholder="John Doe"
+                        className="w-full bg-input border border-border/85 px-4 py-2.5 rounded-xl text-xs focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs uppercase tracking-wider text-muted-foreground mb-1.5 font-medium">
-                        Work Email
+                      <label
+                        htmlFor="email-input"
+                        className="block text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1"
+                      >
+                        Email Address
                       </label>
                       <input
+                        id="email-input"
                         type="email"
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full bg-input border border-border px-3.5 py-2.5 rounded-xl text-xs focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium"
-                        placeholder="Enter email"
+                        placeholder="john@example.com"
+                        className="w-full bg-input border border-border/85 px-4 py-2.5 rounded-xl text-xs focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs uppercase tracking-wider text-muted-foreground mb-1.5 font-medium">
-                        Project Notes (Optional)
+                      <label
+                        htmlFor="notes-input"
+                        className="block text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1"
+                      >
+                        Additional Notes / Request Details
                       </label>
                       <textarea
-                        rows={3}
+                        id="notes-input"
+                        rows={4}
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
-                        className="w-full bg-input border border-border px-3.5 py-2.5 rounded-xl text-xs focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all text-foreground"
-                        placeholder="Enter any additional requirements, target launch deadline, or custom integration details..."
+                        placeholder="Tell us about custom integrations or specific project details..."
+                        className="w-full bg-input border border-border/85 px-4 py-2.5 rounded-xl text-xs focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all resize-none"
                       />
                     </div>
                   </div>
 
-                  {/* Summary recap specs */}
-                  <div className="bg-muted/40 p-4 border border-border/10 rounded-2xl space-y-2 text-xs text-muted-foreground">
-                    <span className="font-semibold text-foreground block">
-                      Build Summary Specs:
-                    </span>
-                    <div className="grid grid-cols-2 gap-2 text-[10px]">
-                      <div>
-                        Build Components:{" "}
-                        <span className="font-medium text-foreground uppercase">
-                          {configuredCount}
-                        </span>
-                      </div>
-                      <div>
-                        Support Tier:{" "}
-                        <span className="font-medium text-foreground uppercase">
-                          {carePlan === "pro"
-                            ? "Care Pro (3Y)"
-                            : carePlan === "care"
-                              ? "Care (1Y)"
-                              : "Included (3M)"}
-                        </span>
-                      </div>
-                      <div>
-                        Payment terms:{" "}
-                        <span className="font-medium text-foreground uppercase">
-                          {isPayInFull ? "Pay in Full (-10%)" : "Milestone Term"}
-                        </span>
-                      </div>
-                      <div>
-                        Tax / VAT (7.5%):{" "}
-                        <span className="font-medium text-foreground">${vat.toLocaleString()}</span>
-                      </div>
-                    </div>
-                    <div className="text-[10px] pt-1.5 border-t border-border/20 flex justify-between items-baseline">
-                      <span>Total Estimated Cost:</span>
-                      <span className="font-semibold text-foreground text-sm">
-                        ${grandTotal.toLocaleString()}
-                      </span>
-                    </div>
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl text-primary-foreground py-3 text-xs font-semibold hover:scale-[1.01] transition-all glow-primary"
+                      style={{ background: "var(--gradient-primary)" }}
+                    >
+                      Submit Configuration Specs <ArrowRight className="h-3.5 w-3.5" />
+                    </button>
                   </div>
-
-                  <button
-                    type="submit"
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-lg text-primary-foreground py-3.5 text-xs font-semibold hover:scale-[1.01] transition-all glow-primary"
-                    style={{ background: "var(--gradient-primary)" }}
-                  >
-                    Submit Specifications <ArrowRight className="h-3.5 w-3.5" />
-                  </button>
                 </form>
               )}
             </motion.div>
@@ -1244,5 +1369,19 @@ export default function BuildPage() {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+export default function BuildPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen grid place-items-center bg-background text-foreground font-mono text-xs">
+          Loading Build Studio...
+        </div>
+      }
+    >
+      <BuildStudioContent />
+    </Suspense>
   );
 }
