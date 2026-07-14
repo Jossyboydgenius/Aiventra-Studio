@@ -228,11 +228,6 @@ export default function PrivacyPolicy() {
                   hello@aiventrastudio.com
                 </a>
               </li>
-              <li>
-                <a href="tel:+2348085082246" className="hover:text-primary transition-colors">
-                  +234 808 508 2246
-                </a>
-              </li>
               <li>Remote</li>
             </ul>
           </div>

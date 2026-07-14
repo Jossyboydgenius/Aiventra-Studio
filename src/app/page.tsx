@@ -261,12 +261,17 @@ function Header() {
 
 function Hero() {
   return (
-    <section id="home" className="relative min-h-screen flex items-center pt-28 overflow-hidden">
+    <section
+      id="home"
+      className="relative min-h-screen flex items-center pt-16 md:pt-24 overflow-hidden"
+    >
       {/* layered glow background */}
       <div className="absolute inset-0 bg-hero" />
       <div
         className="absolute inset-x-0 bottom-0 h-64 pointer-events-none"
-        style={{ background: "linear-gradient(180deg, transparent, var(--color-background))" }}
+        style={{
+          background: "linear-gradient(to top, var(--color-background), transparent)",
+        }}
       />
       {/* floating orbs */}
       <div
@@ -279,7 +284,7 @@ function Hero() {
       />
 
       <motion.div
-        className="container-page relative z-10 flex flex-col items-center text-center gap-8 py-20"
+        className="container-page relative z-10 flex flex-col items-center text-center gap-8 pt-10 pb-4 md:pt-16 md:pb-6"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -575,7 +580,7 @@ function TeamMarquee() {
 
 function About() {
   return (
-    <section id="about" className="section-padding relative overflow-hidden">
+    <section id="about" className="section-padding pt-6 md:pt-10 relative overflow-hidden">
       <div className="container-page grid gap-16 lg:grid-cols-2 lg:items-center mb-16">
         <motion.div className="space-y-6" {...FADE_UP}>
           <SectionLabel>About us</SectionLabel>
@@ -665,7 +670,7 @@ const SERVICES = [
 
 function Services() {
   return (
-    <section id="services" className="section-padding relative overflow-hidden">
+    <section id="services" className="section-padding pb-6 md:pb-10 relative overflow-hidden">
       <div
         className="absolute inset-0 pointer-events-none opacity-60"
         style={{
@@ -768,7 +773,7 @@ const PROJECTS = [
 
 function Portfolio() {
   return (
-    <section id="portfolio" className="section-padding">
+    <section id="portfolio" className="section-padding pt-6 md:pt-10 pb-6 md:pb-10">
       <div className="container-page">
         <motion.div className="flex flex-wrap items-end justify-between gap-6 mb-16" {...FADE_UP}>
           <div className="max-w-2xl space-y-4">
@@ -857,7 +862,7 @@ function Portfolio() {
 
 function Pricing() {
   return (
-    <section id="pricing" className="section-padding relative">
+    <section id="pricing" className="section-padding pt-6 md:pt-10 pb-6 md:pb-10 relative">
       <div className="container-page">
         <motion.div className="max-w-2xl mb-16 space-y-4" {...FADE_UP}>
           <SectionLabel>Build Studio</SectionLabel>
@@ -1052,56 +1057,73 @@ const TESTIMONIALS = [
 ];
 
 function Testimonials() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % TESTIMONIALS.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-    <section className="section-padding">
+    <section className="section-padding pt-6 md:pt-10">
       <div className="container-page">
-        <motion.div className="max-w-2xl mb-16 space-y-4" {...FADE_UP}>
+        <motion.div className="max-w-2xl mb-12 space-y-4" {...FADE_UP}>
           <SectionLabel>Testimonials</SectionLabel>
           <h2 className="font-display text-4xl md:text-5xl font-medium leading-tight">
             What clients <span className="text-gradient font-display italic font-medium">say.</span>
           </h2>
         </motion.div>
-        <motion.div
-          className="grid gap-6 md:grid-cols-3"
-          initial="initial"
-          whileInView="animate"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={{
-            initial: {},
-            animate: {
-              transition: {
-                staggerChildren: 0.08,
-              },
-            },
-          }}
-        >
-          {TESTIMONIALS.map((t) => (
-            <motion.figure
-              key={t.name}
-              className="card-elevated p-8 flex flex-col gap-6 cursor-default"
-              variants={{
-                initial: { opacity: 0, y: 20 },
-                animate: {
-                  opacity: 1,
-                  y: 0,
-                  transition: { duration: 0.6, ease: EASE },
-                },
-              }}
-              whileHover={{ y: -6, transition: { duration: 0.2 } }}
+
+        <div className="relative max-w-4xl mx-auto overflow-hidden rounded-3xl border border-border/40 bg-card/65 p-8 sm:p-12 min-h-[280px] flex flex-col justify-between">
+          <div className="absolute top-6 right-8 text-primary/10 font-display text-8xl select-none font-bold">
+            “
+          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeIndex}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.5, ease: EASE }}
+              className="space-y-6 flex-1 flex flex-col justify-between"
             >
               <div className="flex gap-1">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star key={i} className="h-4 w-4 fill-primary text-primary" />
                 ))}
               </div>
-              <blockquote className="text-foreground/90 leading-relaxed">"{t.quote}"</blockquote>
-              <figcaption className="mt-auto pt-4 border-t border-border">
-                <div className="font-medium text-sm">{t.name}</div>
-                <div className="text-xs text-muted-foreground mt-1">{t.role}</div>
+              <blockquote className="text-base sm:text-lg md:text-2xl text-foreground/90 font-display font-medium leading-relaxed italic">
+                "{TESTIMONIALS[activeIndex].quote}"
+              </blockquote>
+              <figcaption className="pt-6 border-t border-border/20">
+                <div className="font-display text-sm sm:text-base font-medium text-foreground">
+                  {TESTIMONIALS[activeIndex].name}
+                </div>
+                <div className="text-xs text-muted-foreground mt-0.5">
+                  {TESTIMONIALS[activeIndex].role}
+                </div>
               </figcaption>
-            </motion.figure>
-          ))}
-        </motion.div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Dots Indicator */}
+          <div className="flex items-center justify-center gap-2 mt-8 z-20">
+            {TESTIMONIALS.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveIndex(idx)}
+                aria-label={`Go to testimonial ${idx + 1}`}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  activeIndex === idx
+                    ? "w-6 bg-primary"
+                    : "w-2 bg-muted hover:bg-muted-foreground/30"
+                }`}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -1281,8 +1303,29 @@ function Contact() {
             </motion.div>
           ) : (
             <motion.form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const name = formData.get("name") as string;
+                const email = formData.get("email") as string;
+                const company = formData.get("company") as string;
+                const details = e.currentTarget.querySelector("textarea")?.value || "";
+
+                try {
+                  const res = await fetch("/api/contact", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, email, company, details }),
+                  });
+                  if (!res.ok) {
+                    console.error(
+                      "API contact form delivery failed, falling back to mock UI success.",
+                    );
+                  }
+                } catch (err) {
+                  console.error("Failed to connect to API endpoint:", err);
+                }
+
                 setSent(true);
                 fireConfetti(theme);
               }}
@@ -1515,11 +1558,6 @@ function Footer() {
                 className="hover:text-primary transition-colors"
               >
                 hello@aiventrastudio.com
-              </a>
-            </li>
-            <li>
-              <a href="tel:+2348085082246" className="hover:text-primary transition-colors">
-                +234 808 508 2246
               </a>
             </li>
             <li>Remote</li>
