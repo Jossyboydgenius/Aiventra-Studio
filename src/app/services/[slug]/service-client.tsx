@@ -32,12 +32,13 @@ import logoBlue from "@/assets/logo-blue.png";
 // import logoGold from "@/assets/logo-gold.png"; // gold disabled
 
 // Project assets
-import projectNimbus from "@/assets/project-nimbus.png";
-import projectForge from "@/assets/project-forge.png";
-import projectHelix from "@/assets/project-helix.png";
-import projectOrbit from "@/assets/project-orbit.png";
-import projectAtlas from "@/assets/project-atlas.png";
-import projectQuartz from "@/assets/project-quartz.png";
+import projectPrimaPlug from "@/assets/projects/prima-plug.jpeg";
+import projectEasyLiveTech from "@/assets/projects/easylivetech.jpeg";
+import projectRiskPay from "@/assets/projects/riskpay.jpeg";
+import projectGlobalRelocate from "@/assets/projects/global-relocate.jpeg";
+import projectTeknotePro from "@/assets/projects/teknote-pro.jpeg";
+import projectLiteFi from "@/assets/projects/litefi.jpeg";
+import projectCostShrink from "@/assets/projects/cost-shrink.jpeg";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -50,46 +51,65 @@ const FADE_UP = {
 // Static projects data matching page.tsx
 const PROJECTS = [
   {
-    title: "Nimbus Analytics",
-    tag: "SaaS · Dashboard",
-    desc: "Real-time analytics platform for fintech.",
-    image: projectNimbus,
-    slugs: ["web-development", "lead-generation-funnels", "e-commerce-revenue-setup"],
+    title: "PrimaPlug",
+    tag: "SaaS · Marketplace",
+    desc: "A digital marketplace connecting businesses with trusted global service providers.",
+    image: projectPrimaPlug,
+    slugs: ["web-development", "booking-crm-pipelines"],
+    link: "https://primaplug.com/",
   },
   {
-    title: "Forge Mobile",
-    tag: "iOS · Android",
-    desc: "Field service app used by 12k technicians daily.",
-    image: projectForge,
-    slugs: ["mobile-app-development"],
+    title: "EasyLiveTech",
+    tag: "Web · Growth Agency",
+    desc: "Building online sales systems, funnels, mobile apps, and automated workflows.",
+    image: projectEasyLiveTech,
+    slugs: [
+      "web-development",
+      "lead-generation-funnels",
+      "booking-crm-pipelines",
+      "ai-workflows-automation",
+    ],
+    link: "https://www.easylivetech.com/",
   },
   {
-    title: "Helix CMS",
-    tag: "WordPress · Headless",
-    desc: "Headless WP powering a 200-page magazine.",
-    image: projectHelix,
-    slugs: ["web-development"],
+    title: "Risk Pay",
+    tag: "Web · FinTech",
+    desc: "Payment gateway with WooCommerce integration and instant USDC payouts.",
+    image: projectRiskPay,
+    slugs: ["web-development", "e-commerce-revenue-setup"],
+    link: "https://riskpay.biz/",
   },
   {
-    title: "Orbit Runner",
-    tag: "Unity · Steam",
-    desc: "Hyper-arcade title shipped on Steam & Switch.",
-    image: projectOrbit,
-    slugs: ["mobile-app-development", "web-development"],
+    title: "Global Relocate",
+    tag: "SaaS · AI Platform",
+    desc: "AI-powered international relocation platform with country-by-country comparison metrics.",
+    image: projectGlobalRelocate,
+    slugs: ["web-development", "ai-workflows-automation"],
+    link: "https://globalrelocate.com/",
   },
   {
-    title: "Atlas Agent",
-    tag: "AI · Automation",
-    desc: "Multi-step LLM agent automating sales ops.",
-    image: projectAtlas,
-    slugs: ["ai-workflows-automation", "booking-crm-pipelines"],
+    title: "Teknotes Pro",
+    tag: "Web · HealthTech",
+    desc: "HIPAA-compliant note-taking and consent form platform built for medical professionals.",
+    image: projectTeknotePro,
+    slugs: ["web-development", "booking-crm-pipelines"],
+    link: "https://teknotespro.com/",
   },
   {
-    title: "Quartz Desktop",
-    tag: "Tauri · Cross-platform",
-    desc: "Privacy-first note app on Mac, Win & Linux.",
-    image: projectQuartz,
-    slugs: ["web-development", "mobile-app-development"],
+    title: "LiteFi",
+    tag: "SaaS · FinTech",
+    desc: "Personal finance ecosystem with savings, investments, loans, and auto-financing.",
+    image: projectLiteFi,
+    slugs: ["web-development", "booking-crm-pipelines"],
+    link: "https://litefi.ng/",
+  },
+  {
+    title: "Cost Shrink Inc",
+    tag: "Web · Corporate",
+    desc: " consulting website with automated email validation and SEO compliance.",
+    image: projectCostShrink,
+    slugs: ["web-development", "lead-generation-funnels"],
+    link: "https://www.costshrinkinc.com/",
   },
 ];
 
@@ -409,9 +429,12 @@ export default function ServiceClient({ slug }: { slug: string }) {
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {matchingProjects.map((proj) => (
-                <div
+                <a
+                  href={proj.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   key={proj.title}
-                  className="group relative overflow-hidden rounded-2xl border border-border/40 bg-card p-6 flex flex-col justify-between aspect-[4/3] cursor-default"
+                  className="block group relative overflow-hidden rounded-2xl border border-border/40 bg-card p-6 flex flex-col justify-between aspect-[4/3] cursor-pointer"
                 >
                   <img
                     src={proj.image.src}
@@ -428,7 +451,7 @@ export default function ServiceClient({ slug }: { slug: string }) {
                     </h3>
                     <p className="text-xs text-white/80 font-medium">{proj.desc}</p>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
           </div>

@@ -12,60 +12,76 @@ import logoBlue from "@/assets/logo-blue.png";
 // import logoGold from "@/assets/logo-gold.png"; // gold disabled
 
 // Project assets
-import projectNimbus from "@/assets/project-nimbus.png";
-import projectForge from "@/assets/project-forge.png";
-import projectHelix from "@/assets/project-helix.png";
-import projectOrbit from "@/assets/project-orbit.png";
-import projectAtlas from "@/assets/project-atlas.png";
-import projectQuartz from "@/assets/project-quartz.png";
+import projectPrimaPlug from "@/assets/projects/prima-plug.jpeg";
+import projectEasyLiveTech from "@/assets/projects/easylivetech.jpeg";
+import projectRiskPay from "@/assets/projects/riskpay.jpeg";
+import projectGlobalRelocate from "@/assets/projects/global-relocate.jpeg";
+import projectTeknotePro from "@/assets/projects/teknote-pro.jpeg";
+import projectLiteFi from "@/assets/projects/litefi.jpeg";
+import projectCostShrink from "@/assets/projects/cost-shrink.jpeg";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-const CATEGORIES = ["All", "SaaS & Web", "Mobile", "AI & Automation", "Games"] as const;
+// Categories for filter
+const CATEGORIES = ["All", "SaaS & Web", "AI & Automation"] as const;
 type Category = (typeof CATEGORIES)[number];
 
 const PROJECTS = [
   {
-    title: "Nimbus Analytics",
-    tag: "SaaS · Dashboard",
-    desc: "Real-time analytics platform for fintech, providing robust charting widgets, sub-second aggregation, and cross-account data ingestion.",
-    image: projectNimbus,
+    title: "PrimaPlug",
+    tag: "SaaS · Marketplace",
+    desc: "A digital marketplace that connects businesses with trusted service providers across the world to seamlessly manage projects.",
+    image: projectPrimaPlug,
     categories: ["SaaS & Web"] as Category[],
+    link: "https://primaplug.com/",
   },
   {
-    title: "Forge Mobile",
-    tag: "iOS · Android",
-    desc: "Field service app used by 12k technicians daily. Engineered offline synchronization databases, push alert systems, and native device location tracking.",
-    image: projectForge,
-    categories: ["Mobile"] as Category[],
-  },
-  {
-    title: "Helix CMS",
-    tag: "WordPress · Headless",
-    desc: "Headless WP powering a 200-page magazine. Front-end is written in static-compiled Next.js, scaling up delivery times and caching via edge networks.",
-    image: projectHelix,
+    title: "EasyLiveTech",
+    tag: "Web · Growth Agency",
+    desc: "Designing high-converting websites, sales funnels, CRM systems, automations, mobile apps, and AI-powered workflows.",
+    image: projectEasyLiveTech,
     categories: ["SaaS & Web"] as Category[],
+    link: "https://www.easylivetech.com/",
   },
   {
-    title: "Orbit Runner",
-    tag: "Unity · Steam",
-    desc: "Hyper-arcade titles shipped on Steam & Switch. Implemented 60FPS fluid physics triggers, particle controllers, and global leaderboards integration.",
-    image: projectOrbit,
-    categories: ["Games"] as Category[],
+    title: "Risk Pay",
+    tag: "Web · FinTech",
+    desc: "A secure payment gateway for high-risk businesses featuring instant USDC payouts and WooCommerce plugin integration.",
+    image: projectRiskPay,
+    categories: ["SaaS & Web"] as Category[],
+    link: "https://riskpay.biz/",
   },
   {
-    title: "Atlas Agent",
-    tag: "AI · Automation",
-    desc: "Multi-step LLM agent automating sales operations. Features custom semantic matching routers, calendar APIs, and automated response drafts.",
-    image: projectAtlas,
-    categories: ["AI & Automation"] as Category[],
+    title: "Global Relocate",
+    tag: "SaaS · AI Platform",
+    desc: "AI-powered international relocation assistant comparing cost of living, tax structures, and quality of life.",
+    image: projectGlobalRelocate,
+    categories: ["SaaS & Web", "AI & Automation"] as Category[],
+    link: "https://globalrelocate.com/",
   },
   {
-    title: "Quartz Desktop",
-    tag: "Tauri · Cross-platform",
-    desc: "Privacy-first note taking app on Mac, Win & Linux. Combines local database encryption and high-performance Markdown editing tools.",
-    image: projectQuartz,
-    categories: ["SaaS & Web", "Mobile"] as Category[],
+    title: "Teknotes Pro",
+    tag: "Web · HealthTech",
+    desc: "HIPAA-compliant clinical note-taking and consent form platform built for secure staff messaging and healthcare coordination.",
+    image: projectTeknotePro,
+    categories: ["SaaS & Web"] as Category[],
+    link: "https://teknotespro.com/",
+  },
+  {
+    title: "LiteFi",
+    tag: "SaaS · FinTech",
+    desc: "Personal finance ecosystem with integrated savings, investments, loans, and auto-financing modules.",
+    image: projectLiteFi,
+    categories: ["SaaS & Web"] as Category[],
+    link: "https://litefi.ng/",
+  },
+  {
+    title: "Cost Shrink Inc",
+    tag: "Web · Corporate",
+    desc: "A fully responsive business consulting site optimized for SEO and performance, utilizing ZeptoMail API and Nodemailer for automated email flows.",
+    image: projectCostShrink,
+    categories: ["SaaS & Web"] as Category[],
+    link: "https://www.costshrinkinc.com/",
   },
 ];
 
@@ -135,11 +151,10 @@ export default function PortfolioPage() {
               <button
                 key={cat}
                 onClick={() => setSelected(cat)}
-                className={`px-5 py-2 text-xs uppercase tracking-widest font-semibold rounded-full border transition-all ${
-                  active
-                    ? "bg-primary border-primary text-primary-foreground shadow-md"
-                    : "border-border/60 hover:border-primary/50 text-muted-foreground hover:text-foreground"
-                }`}
+                className={`px-5 py-2 text-xs uppercase tracking-widest font-semibold rounded-full border transition-all ${active
+                  ? "bg-primary border-primary text-primary-foreground shadow-md"
+                  : "border-border/60 hover:border-primary/50 text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 {cat}
               </button>
@@ -154,39 +169,46 @@ export default function PortfolioPage() {
         >
           <AnimatePresence mode="popLayout">
             {filteredProjects.map((p) => (
-              <motion.article
-                layout
+              <a
+                href={p.link}
+                target="_blank"
+                rel="noopener noreferrer"
                 key={p.title}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.5, ease: EASE }}
-                className="card-elevated card-elevated-hover overflow-hidden group cursor-pointer flex flex-col justify-between h-full"
+                className="block h-full"
               >
-                <div className="aspect-[4/3] relative overflow-hidden bg-muted">
-                  <img
-                    src={p.image.src}
-                    alt={p.title}
-                    className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none z-10" />
+                <motion.article
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.5, ease: EASE }}
+                  className="card-elevated card-elevated-hover overflow-hidden group cursor-pointer flex flex-col justify-between h-full"
+                >
+                  <div className="aspect-[4/3] relative overflow-hidden bg-muted">
+                    <img
+                      src={p.image.src}
+                      alt={p.title}
+                      className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none z-10" />
 
-                  <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between z-20">
-                    <span className="font-display text-2xl font-medium text-white drop-shadow-md">
-                      {p.title}
-                    </span>
-                    <ArrowUpRight className="h-5 w-5 text-white -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all drop-shadow" />
-                  </div>
-                </div>
-                <div className="p-6 flex-1 flex flex-col justify-between">
-                  <div>
-                    <div className="text-xs uppercase tracking-wider text-primary mb-2">
-                      {p.tag}
+                    <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between z-20">
+                      <span className="font-display text-2xl font-medium text-white drop-shadow-md">
+                        {p.title}
+                      </span>
+                      <ArrowUpRight className="h-5 w-5 text-white -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all drop-shadow" />
                     </div>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{p.desc}</p>
                   </div>
-                </div>
-              </motion.article>
+                  <div className="p-6 flex-1 flex flex-col justify-between">
+                    <div>
+                      <div className="text-xs uppercase tracking-wider text-primary mb-2">
+                        {p.tag}
+                      </div>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{p.desc}</p>
+                    </div>
+                  </div>
+                </motion.article>
+              </a>
             ))}
           </AnimatePresence>
         </motion.div>

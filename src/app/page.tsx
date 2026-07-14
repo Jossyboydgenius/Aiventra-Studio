@@ -35,12 +35,13 @@ import teamShayor from "@/assets/Shayor.jpeg";
 import teamFemi from "@/assets/Femi.jpeg";
 
 // Projects assets
-import projectNimbus from "@/assets/project-nimbus.png";
-import projectForge from "@/assets/project-forge.png";
-import projectHelix from "@/assets/project-helix.png";
-import projectOrbit from "@/assets/project-orbit.png";
-import projectAtlas from "@/assets/project-atlas.png";
-import projectQuartz from "@/assets/project-quartz.png";
+import projectPrimaPlug from "@/assets/projects/prima-plug.jpeg";
+import projectEasyLiveTech from "@/assets/projects/easylivetech.jpeg";
+import projectRiskPay from "@/assets/projects/riskpay.jpeg";
+import projectGlobalRelocate from "@/assets/projects/global-relocate.jpeg";
+import projectTeknotePro from "@/assets/projects/teknote-pro.jpeg";
+import projectLiteFi from "@/assets/projects/litefi.jpeg";
+import { toast } from "sonner";
 
 import {
   ArrowRight,
@@ -734,40 +735,46 @@ function Services() {
 
 const PROJECTS = [
   {
-    title: "Nimbus Analytics",
-    tag: "SaaS · Dashboard",
-    desc: "Real-time analytics platform for fintech.",
-    image: projectNimbus,
+    title: "PrimaPlug",
+    tag: "SaaS · Marketplace",
+    desc: "A digital marketplace that connects businesses with trusted service providers across the world to seamlessly manage projects.",
+    image: projectPrimaPlug,
+    link: "https://primaplug.com/",
   },
   {
-    title: "Forge Mobile",
-    tag: "iOS · Android",
-    desc: "Field service app used by 12k technicians daily.",
-    image: projectForge,
+    title: "EasyLiveTech",
+    tag: "Web · Growth Agency",
+    desc: "Designing high-converting websites, sales funnels, CRM systems, automations, mobile apps, and AI-powered workflows.",
+    image: projectEasyLiveTech,
+    link: "https://www.easylivetech.com/",
   },
   {
-    title: "Helix CMS",
-    tag: "WordPress · Headless",
-    desc: "Headless WP powering a 200-page magazine.",
-    image: projectHelix,
+    title: "Risk Pay",
+    tag: "Web · FinTech",
+    desc: "A secure payment gateway for high-risk businesses featuring instant USDC payouts and WooCommerce plugin integration.",
+    image: projectRiskPay,
+    link: "https://riskpay.biz/",
   },
   {
-    title: "Orbit Runner",
-    tag: "Unity · Steam",
-    desc: "Hyper-arcade title shipped on Steam & Switch.",
-    image: projectOrbit,
+    title: "Global Relocate",
+    tag: "SaaS · AI Platform",
+    desc: "AI-powered international relocation assistant comparing cost of living, tax structures, and quality of life.",
+    image: projectGlobalRelocate,
+    link: "https://globalrelocate.com/",
   },
   {
-    title: "Atlas Agent",
-    tag: "AI · Automation",
-    desc: "Multi-step LLM agent automating sales ops.",
-    image: projectAtlas,
+    title: "Teknotes Pro",
+    tag: "Web · HealthTech",
+    desc: "HIPAA-compliant clinical note-taking and consent form platform built for secure staff messaging and healthcare coordination.",
+    image: projectTeknotePro,
+    link: "https://teknotespro.com/",
   },
   {
-    title: "Quartz Desktop",
-    tag: "Tauri · Cross-platform",
-    desc: "Privacy-first note app on Mac, Win & Linux.",
-    image: projectQuartz,
+    title: "LiteFi",
+    tag: "SaaS · FinTech",
+    desc: "Personal finance ecosystem with integrated savings, investments, loans, and auto-financing modules.",
+    image: projectLiteFi,
+    link: "https://litefi.ng/",
   },
 ];
 
@@ -802,42 +809,49 @@ function Portfolio() {
           }}
         >
           {PROJECTS.map((p, i) => (
-            <motion.article
+            <a
+              href={p.link}
+              target="_blank"
+              rel="noopener noreferrer"
               key={p.title}
-              className="card-elevated card-elevated-hover overflow-hidden group cursor-pointer"
-              variants={{
-                initial: { opacity: 0, y: 20 },
-                animate: {
-                  opacity: 1,
-                  y: 0,
-                  transition: { duration: 0.6, ease: EASE },
-                },
-              }}
-              whileHover={{ y: -6, transition: { duration: 0.2 } }}
+              className="block"
             >
-              <div className="aspect-[4/3] relative overflow-hidden bg-muted">
-                {/* Generated Project Asset */}
-                <img
-                  src={p.image.src}
-                  alt={p.title}
-                  className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                />
+              <motion.article
+                className="card-elevated card-elevated-hover overflow-hidden group cursor-pointer"
+                variants={{
+                  initial: { opacity: 0, y: 20 },
+                  animate: {
+                    opacity: 1,
+                    y: 0,
+                    transition: { duration: 0.6, ease: EASE },
+                  },
+                }}
+                whileHover={{ y: -6, transition: { duration: 0.2 } }}
+              >
+                <div className="aspect-[4/3] relative overflow-hidden bg-muted">
+                  {/* Generated Project Asset */}
+                  <img
+                    src={p.image.src}
+                    alt={p.title}
+                    className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                  />
 
-                {/* Glass dark overlay layer for maximum readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none z-10" />
+                  {/* Glass dark overlay layer for maximum readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none z-10" />
 
-                <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between z-20">
-                  <span className="font-display text-2xl font-medium text-white drop-shadow-md">
-                    {p.title}
-                  </span>
-                  <ArrowUpRight className="h-5 w-5 text-white -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all drop-shadow" />
+                  <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between z-20">
+                    <span className="font-display text-2xl font-medium text-white drop-shadow-md">
+                      {p.title}
+                    </span>
+                    <ArrowUpRight className="h-5 w-5 text-white -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all drop-shadow" />
+                  </div>
                 </div>
-              </div>
-              <div className="p-6">
-                <div className="text-xs uppercase tracking-wider text-primary mb-2">{p.tag}</div>
-                <p className="text-sm text-muted-foreground">{p.desc}</p>
-              </div>
-            </motion.article>
+                <div className="p-6">
+                  <div className="text-xs uppercase tracking-wider text-primary mb-2">{p.tag}</div>
+                  <p className="text-sm text-muted-foreground">{p.desc}</p>
+                </div>
+              </motion.article>
+            </a>
           ))}
         </motion.div>
 
@@ -1131,6 +1145,7 @@ function Testimonials() {
 
 function Contact() {
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [hovered, setHovered] = useState(false);
   const { theme } = useTheme();
 
@@ -1305,6 +1320,7 @@ function Contact() {
             <motion.form
               onSubmit={async (e) => {
                 e.preventDefault();
+                setSubmitting(true);
                 const formData = new FormData(e.currentTarget);
                 const name = formData.get("name") as string;
                 const email = formData.get("email") as string;
@@ -1317,17 +1333,22 @@ function Contact() {
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ name, email, company, details }),
                   });
-                  if (!res.ok) {
-                    console.error(
-                      "API contact form delivery failed, falling back to mock UI success.",
-                    );
-                  }
-                } catch (err) {
-                  console.error("Failed to connect to API endpoint:", err);
-                }
+                  const data = await res.json().catch(() => ({}));
 
-                setSent(true);
-                fireConfetti(theme);
+                  if (res.ok) {
+                    setSent(true);
+                    fireConfetti(theme);
+                    toast.success("Message sent successfully!");
+                  } else {
+                    console.error("API contact form delivery failed:", data.error);
+                    toast.error(data.error || "Failed to deliver message. Please try again.");
+                  }
+                } catch (err: any) {
+                  console.error("Failed to connect to API endpoint:", err);
+                  toast.error("Network error: Failed to connect to mail server.");
+                } finally {
+                  setSubmitting(false);
+                }
               }}
               className="card-elevated p-8 space-y-5"
               {...FADE_UP}
@@ -1350,11 +1371,39 @@ function Contact() {
               </div>
               <button
                 type="submit"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:scale-[1.01] glow-primary disabled:opacity-70 whitespace-nowrap"
-                disabled={sent}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:scale-[1.01] glow-primary disabled:opacity-75 disabled:pointer-events-none whitespace-nowrap"
+                disabled={submitting}
                 style={{ background: "var(--gradient-primary)" }}
               >
-                Send message <ArrowRight className="h-4 w-4" />
+                {submitting ? (
+                  <>
+                    <svg
+                      className="animate-spin h-4 w-4 text-primary-foreground"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    Send message <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
               </button>
             </motion.form>
           )}
