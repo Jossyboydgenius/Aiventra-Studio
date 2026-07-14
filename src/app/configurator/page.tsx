@@ -24,8 +24,7 @@ import {
   X,
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
-// ThemeToggle hidden — theme follows OS system preference automatically
-// import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeToggle } from "@/components/theme-toggle";
 import confetti from "canvas-confetti";
 
 // Dynamic palettes hex colors
@@ -269,8 +268,7 @@ export default function ConfiguratorPage() {
           </span>
         </Link>
         <div className="flex items-center gap-3">
-          {/* ThemeToggle hidden — theme follows OS system preference automatically */}
-          {/* <ThemeToggle /> */}
+          <ThemeToggle />
           <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-surface transition-colors"

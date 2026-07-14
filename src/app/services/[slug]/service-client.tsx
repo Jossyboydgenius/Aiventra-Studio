@@ -8,7 +8,6 @@ import {
   ArrowLeft,
   ArrowRight,
   CheckCircle2,
-  Sparkles,
   Globe,
   Smartphone,
   TrendingUp,
@@ -17,8 +16,7 @@ import {
   Bot,
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
-// ThemeToggle hidden — theme follows OS system preference automatically
-// import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 // Tech cell assets
 import cellWa from "@/assets/cell-wa.png";
@@ -296,8 +294,7 @@ export default function ServiceClient({ slug }: { slug: string }) {
           <img src={logoSrc} alt="Aiventra" className="h-9 md:h-10 w-auto object-contain" />
         </Link>
         <div className="flex items-center gap-4">
-          {/* ThemeToggle hidden — theme follows OS system preference automatically */}
-          {/* <ThemeToggle /> */}
+          <ThemeToggle />
           <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-semibold hover:bg-surface transition-colors"
@@ -312,10 +309,6 @@ export default function ServiceClient({ slug }: { slug: string }) {
         {/* Service Hero section */}
         <div className="grid gap-12 lg:grid-cols-12 items-center mb-20">
           <motion.div className="lg:col-span-7 space-y-6" {...FADE_UP}>
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-              <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse" />
-              <span>{data.category}</span>
-            </div>
             <h1 className="font-display text-4xl md:text-6xl font-medium leading-tight">
               {data.title}
             </h1>
@@ -412,9 +405,6 @@ export default function ServiceClient({ slug }: { slug: string }) {
         {matchingProjects.length > 0 && (
           <div className="space-y-10 mb-20">
             <div className="max-w-2xl space-y-2">
-              <span className="text-xs uppercase tracking-widest text-primary font-bold">
-                Case Studies
-              </span>
               <h2 className="font-display text-3xl md:text-4xl font-medium">Similar Projects</h2>
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

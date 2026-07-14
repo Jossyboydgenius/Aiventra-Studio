@@ -3,10 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, ArrowUpRight, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
-// ThemeToggle hidden — theme follows OS system preference automatically
-// import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 // Team member portraits logos
 import logoBlue from "@/assets/logo-blue.png";
@@ -104,8 +103,7 @@ export default function PortfolioPage() {
           <img src={logoSrc} alt="Aiventra" className="h-9 md:h-10 w-auto object-contain" />
         </Link>
         <div className="flex items-center gap-4">
-          {/* ThemeToggle hidden — theme follows OS system preference automatically */}
-          {/* <ThemeToggle /> */}
+          <ThemeToggle />
           <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-semibold hover:bg-surface transition-colors"
@@ -119,12 +117,9 @@ export default function PortfolioPage() {
       <main className="container-page pt-36 relative z-10 space-y-12">
         {/* Title area */}
         <div className="max-w-3xl space-y-4 text-center mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-primary justify-center">
-            <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse" />
-            <span>Case Studies</span>
-          </div>
           <h1 className="font-display text-4xl md:text-6xl font-medium leading-tight">
-            Selected Projects & Works
+            Selected{" "}
+            <span className="text-gradient font-display italic font-medium">Projects & Works</span>
           </h1>
           <p className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
             Explore recent software assets, direct-response acquisition funnels, and dynamic AI

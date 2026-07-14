@@ -19,8 +19,10 @@ import {
   Activity,
   Globe,
   Zap,
+  Smartphone,
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
+import { ThemeToggle } from "@/components/theme-toggle";
 import logoBlue from "@/assets/logo-blue.png";
 import confetti from "canvas-confetti";
 
@@ -251,6 +253,34 @@ const COMPONENTS: ComponentCategory[] = [
       },
     ],
   },
+  {
+    id: "mobile-app",
+    name: "Mobile App Companion",
+    icon: "smartphone",
+    options: [
+      {
+        id: "none",
+        name: "No Mobile App Extension",
+        desc: "Skip mobile app or use web platform capabilities only.",
+        price: 0,
+        tags: ["Excluded"],
+      },
+      {
+        id: "starter-mobile",
+        name: "Starter Companion App",
+        desc: "Single-platform (iOS or Android) simple React Native application ($3,000 – $6,000 range).",
+        price: 3500,
+        tags: ["Mobile"],
+      },
+      {
+        id: "cross-platform",
+        name: "Cross-Platform Mobile App",
+        desc: "Bespoke iOS & Android application with push alerts and local sync ($8,000 – $15,000 range).",
+        price: 8500,
+        tags: ["Mobile"],
+      },
+    ],
+  },
 ];
 
 // Presets based on the new tiers
@@ -267,6 +297,7 @@ const PRESETS = [
       "conversion-cro": "none",
       "seo-search": "none",
       "advanced-automation": "none",
+      "mobile-app": "none",
     },
   },
   {
@@ -281,6 +312,7 @@ const PRESETS = [
       "conversion-cro": "none",
       "seo-search": "none",
       "advanced-automation": "none",
+      "mobile-app": "none",
     },
   },
   {
@@ -295,6 +327,7 @@ const PRESETS = [
       "conversion-cro": "none",
       "seo-search": "none",
       "advanced-automation": "none",
+      "mobile-app": "none",
     },
   },
   {
@@ -309,6 +342,37 @@ const PRESETS = [
       "conversion-cro": "analytics",
       "seo-search": "none",
       "advanced-automation": "none",
+      "mobile-app": "none",
+    },
+  },
+  {
+    name: "Starter Mobile App",
+    desc: "Dedicated single-platform mobile app package with auth and app store submission.",
+    cost: "$3,500",
+    selections: {
+      tier: "starter",
+      "crm-setup": "none",
+      "funnels-marketing": "none",
+      "chatbot-booking": "none",
+      "conversion-cro": "none",
+      "seo-search": "none",
+      "advanced-automation": "none",
+      "mobile-app": "starter-mobile",
+    },
+  },
+  {
+    name: "Standard Mobile Suite",
+    desc: "Full cross-platform (iOS + Android) application with payments & CRM synchronization.",
+    cost: "$11,000",
+    selections: {
+      tier: "standard",
+      "crm-setup": "web-crm",
+      "funnels-marketing": "none",
+      "chatbot-booking": "none",
+      "conversion-cro": "none",
+      "seo-search": "none",
+      "advanced-automation": "none",
+      "mobile-app": "cross-platform",
     },
   },
 ];
@@ -493,6 +557,7 @@ function BuildStudioContent() {
     "conversion-cro": "none",
     "seo-search": "none",
     "advanced-automation": "none",
+    "mobile-app": "none",
   });
 
   // Protection (Care) Plan — uses CARE_PLANS ids
@@ -516,8 +581,32 @@ function BuildStudioContent() {
   // Read URL query params on mount
   useEffect(() => {
     const preset = searchParams.get("preset");
-    if (preset && BASE_TIERS_IDS.includes(preset)) {
-      setSelections((prev) => ({ ...prev, tier: preset }));
+    if (preset) {
+      if (BASE_TIERS_IDS.includes(preset)) {
+        setSelections((prev) => ({ ...prev, tier: preset }));
+      } else if (preset === "starter-mobile") {
+        setSelections({
+          tier: "starter",
+          "crm-setup": "none",
+          "funnels-marketing": "none",
+          "chatbot-booking": "none",
+          "conversion-cro": "none",
+          "seo-search": "none",
+          "advanced-automation": "none",
+          "mobile-app": "starter-mobile",
+        });
+      } else if (preset === "standard-mobile") {
+        setSelections({
+          tier: "standard",
+          "crm-setup": "web-crm",
+          "funnels-marketing": "none",
+          "chatbot-booking": "none",
+          "conversion-cro": "none",
+          "seo-search": "none",
+          "advanced-automation": "none",
+          "mobile-app": "cross-platform",
+        });
+      }
     }
   }, [searchParams]);
 
@@ -531,6 +620,7 @@ function BuildStudioContent() {
       "conversion-cro": "none",
       "seo-search": "none",
       "advanced-automation": "none",
+      "mobile-app": "none",
     });
     setCarePlan("none");
     setPaymentMethod("full");
@@ -572,7 +662,7 @@ function BuildStudioContent() {
   // VAT (7.5%) calculated on the discounted subtotal
   const taxableAmount = subtotal - discount;
   const vat = Math.round(taxableAmount * 0.075);
-  const grandTotal = taxableAmount + vat;
+  const grandTotal = taxableAmount + vat + careCost;
 
   // Confetti trigger
   const triggerConfetti = () => {
@@ -645,6 +735,8 @@ function BuildStudioContent() {
         return <Globe className="h-4 w-4 text-primary" />;
       case "zap":
         return <Zap className="h-4 w-4 text-primary" />;
+      case "smartphone":
+        return <Smartphone className="h-4 w-4 text-primary" />;
       default:
         return <Layers className="h-4 w-4 text-primary" />;
     }
@@ -669,6 +761,7 @@ function BuildStudioContent() {
           <span className="font-display font-medium text-lg hidden sm:inline">Aiventra Studio</span>
         </Link>
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-surface transition-colors"
@@ -826,7 +919,7 @@ function BuildStudioContent() {
                       Project Subtotal
                     </span>
                     <span className="text-muted-foreground mt-0.5 block">
-                      {configuredCount}/7 components configured
+                      {configuredCount}/8 components configured
                     </span>
                   </div>
                   <div className="flex items-center gap-6">
@@ -1163,7 +1256,7 @@ function BuildStudioContent() {
                   Your Build
                 </span>
                 <span className="text-[10px] font-bold bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full text-primary">
-                  {configuredCount}/7 Selected
+                  {configuredCount}/8 Selected
                 </span>
               </div>
 

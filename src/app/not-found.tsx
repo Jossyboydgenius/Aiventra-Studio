@@ -4,8 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, Mail, Phone, Linkedin, Twitter, Facebook } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
-// ThemeToggle hidden — theme follows OS system preference automatically
-// import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeToggle } from "@/components/theme-toggle";
 import logoBlue from "@/assets/logo-blue.png";
 // import logoGold from "@/assets/logo-gold.png"; // gold disabled
 import heroBlueLight from "@/assets/aiventra-logo-blue-light.png";
@@ -162,8 +161,7 @@ export default function NotFound() {
           <span className="font-display font-medium text-lg hidden sm:inline">Aiventra Studio</span>
         </Link>
         <div className="flex items-center gap-3">
-          {/* ThemeToggle hidden — theme follows OS system preference automatically */}
-          {/* <ThemeToggle /> */}
+          <ThemeToggle />
           <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-surface transition-colors"

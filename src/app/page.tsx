@@ -162,6 +162,7 @@ function Header() {
 
   return (
     <motion.header
+      initial={false}
       animate={{ height: open ? "auto" : "64px" }}
       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
       className={`fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-5xl z-50 rounded-2xl border border-border/40 bg-card/65 shadow-lg backdrop-blur-xl md:overflow-visible ${
@@ -197,8 +198,7 @@ function Header() {
           })}
         </nav>
         <div className="flex items-center gap-2">
-          {/* ThemeToggle hidden — theme follows OS system preference automatically */}
-          {/* <ThemeToggle /> */}
+          <ThemeToggle />
           <a
             href="#contact"
             className="hidden md:inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-primary-foreground transition-all hover:opacity-90 whitespace-nowrap"
@@ -215,44 +215,46 @@ function Header() {
           </button>
         </div>
       </div>
-      <div className="md:hidden border-t border-border/20 px-4 py-6 space-y-6 bg-background/95 rounded-b-2xl">
-        <nav className="flex flex-col gap-2">
-          {NAV.map((n) => {
-            if (n.href.startsWith("/")) {
+      {(open || isTransitioning) && (
+        <div className="md:hidden border-t border-border/20 px-4 py-6 space-y-6 bg-background/95 rounded-b-2xl animate-in fade-in slide-in-from-top-2 duration-200">
+          <nav className="flex flex-col gap-2">
+            {NAV.map((n) => {
+              if (n.href.startsWith("/")) {
+                return (
+                  <Link
+                    key={n.href}
+                    href={n.href}
+                    onClick={() => setOpen(false)}
+                    className="py-2.5 text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {n.label}
+                  </Link>
+                );
+              }
               return (
-                <Link
+                <a
                   key={n.href}
                   href={n.href}
                   onClick={() => setOpen(false)}
                   className="py-2.5 text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {n.label}
-                </Link>
+                </a>
               );
-            }
-            return (
-              <a
-                key={n.href}
-                href={n.href}
-                onClick={() => setOpen(false)}
-                className="py-2.5 text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {n.label}
-              </a>
-            );
-          })}
-        </nav>
-        <div className="flex flex-col gap-3 pt-4 border-t border-border/10">
-          <a
-            href="#contact"
-            onClick={() => setOpen(false)}
-            className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-primary-foreground whitespace-nowrap"
-            style={{ background: "var(--gradient-primary)" }}
-          >
-            Start a project <ArrowRight className="h-4 w-4" />
-          </a>
+            })}
+          </nav>
+          <div className="flex flex-col gap-3 pt-4 border-t border-border/10">
+            <a
+              href="#contact"
+              onClick={() => setOpen(false)}
+              className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-primary-foreground whitespace-nowrap"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              Start a project <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
         </div>
-      </div>
+      )}
     </motion.header>
   );
 }
@@ -284,7 +286,7 @@ function Hero() {
       >
         <HeroLogo />
 
-        <h1 className="font-display text-5xl sm:text-7xl md:text-[5.5rem] font-medium leading-[0.95] tracking-tighter max-w-5xl">
+        <h1 className="font-display text-5xl sm:text-7xl md:text-[5.5rem] font-medium leading-[1.1] tracking-tighter max-w-5xl">
           We engineer products that{" "}
           <span className="text-gradient-primary font-display italic font-medium pr-3">
             elevate

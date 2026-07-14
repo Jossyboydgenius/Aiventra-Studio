@@ -18,6 +18,7 @@ import {
   Facebook,
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
+import { ThemeToggle } from "@/components/theme-toggle";
 import logoBlue from "@/assets/logo-blue.png";
 import heroBlueLight from "@/assets/aiventra-logo-blue-light.png";
 
@@ -100,8 +101,52 @@ const TIERS: Tier[] = [
   },
 ];
 
+const MOBILE_TIERS: Tier[] = [
+  {
+    name: "Starter Mobile",
+    price: "$3,500",
+    desc: "Perfect launching pad for dedicated single-platform mobile apps.",
+    features: [
+      "Single-Platform (iOS or Android)",
+      "React Native or Flutter Framework",
+      "Secure Email Authentication",
+      "Essential REST API Integration",
+      "Standard Push Notifications Setup",
+      "App Store & Google Play Shipping Assistance",
+    ],
+  },
+  {
+    name: "Standard Mobile",
+    price: "$8,500",
+    desc: "Robust cross-platform mobile apps with advanced integrations and offline features.",
+    features: [
+      "Cross-Platform Build (iOS & Android)",
+      "Offline Database Caching Layer",
+      "Advanced Push Notifications Trigger",
+      "Stripe / Payments Gateway Integration",
+      "CRM & Database Synchronization (HubSpot/GHL)",
+      "Custom Interactive UI/UX Transitions",
+    ],
+    popular: true,
+  },
+  {
+    name: "Enterprise Mobile",
+    price: "$20,000+",
+    desc: "Fully bespoke mobile applications with dedicated SLA support and customized infrastructure.",
+    features: [
+      "Bespoke native or hybrid ecosystem",
+      "Real-time bidirectional synchronization",
+      "Apple Pay & Google Pay direct engines",
+      "Custom layout architectures & animations",
+      "Hardened biometrics & secure element authentication",
+      "Dedicated SLAs & priority developer support",
+    ],
+  },
+];
+
 export default function PricingPage() {
   const { theme } = useTheme();
+  const [activePlatform, setActivePlatform] = useState<"web" | "mobile">("web");
   const [activeTab, setActiveTab] = useState<"cross-sell" | "upsell" | "recurring">("cross-sell");
 
   const logoSrc = logoBlue.src;
@@ -127,6 +172,7 @@ export default function PricingPage() {
           <span className="font-display font-medium text-lg hidden sm:inline">Aiventra Studio</span>
         </Link>
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-surface transition-colors"
@@ -168,174 +214,281 @@ export default function PricingPage() {
           </motion.p>
         </section>
 
-        {/* Pricing Cards Grid */}
-        <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 pt-6">
-          {TIERS.slice(0, 3).map((tier, idx) => (
-            <motion.div
-              key={tier.name}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: idx * 0.1, ease: EASE }}
-              className={`relative flex flex-col justify-between p-6 sm:p-8 rounded-3xl border transition-all ${
-                tier.popular
-                  ? "bg-card border-primary/50 shadow-xl shadow-primary/5 md:scale-[1.03]"
-                  : "bg-card/60 border-border/60"
+        {/* Web vs Mobile Platforms Toggle */}
+        <div className="flex justify-center mt-4 mb-10">
+          <div className="flex rounded-full bg-muted/60 p-1 border border-border/40 backdrop-blur-md">
+            <button
+              onClick={() => setActivePlatform("web")}
+              className={`px-6 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${
+                activePlatform === "web"
+                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.02]"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              {tier.popular && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-primary-foreground/10">
-                  Most Popular
-                </div>
-              )}
-              <div className="space-y-4">
-                <div className="space-y-1">
-                  <h3 className="font-display text-2xl font-medium">{tier.name}</h3>
-                  <p className="text-xs text-muted-foreground min-h-[32px]">{tier.desc}</p>
-                </div>
-                <div className="flex items-baseline gap-1 py-2">
-                  <span className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
-                    {tier.price}
-                  </span>
-                  <span className="text-xs text-muted-foreground">one-off</span>
-                </div>
-                <div className="border-t border-border/20 pt-4 space-y-3.5">
-                  <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground block">
-                    What's Included
-                  </span>
-                  <ul className="space-y-2.5">
-                    {tier.features.map((f) => (
-                      <li
-                        key={f}
-                        className="flex items-start gap-2.5 text-xs text-muted-foreground"
-                      >
-                        <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-              <div className="pt-8">
-                <Link
-                  href={`/build?preset=${tier.name.toLowerCase()}`}
-                  className={`w-full inline-flex items-center justify-center gap-2 rounded-xl py-3 text-xs font-semibold transition-all ${
-                    tier.popular
-                      ? "text-primary-foreground glow-primary"
-                      : "border border-border text-foreground hover:bg-surface"
-                  }`}
-                  style={tier.popular ? { background: "var(--gradient-primary)" } : undefined}
-                >
-                  Configure Plan <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-            </motion.div>
-          ))}
-
-          {/* Professional and Enterprise row */}
-          {TIERS.slice(3).map((tier, idx) => (
-            <motion.div
-              key={tier.name}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: (idx + 3) * 0.1, ease: EASE }}
-              className="relative flex flex-col justify-between p-6 sm:p-8 rounded-3xl border bg-card/60 border-border/60 lg:col-span-1"
+              Web Platforms
+            </button>
+            <button
+              onClick={() => setActivePlatform("mobile")}
+              className={`px-6 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${
+                activePlatform === "mobile"
+                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.02]"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
-              <div className="space-y-4">
-                <div className="space-y-1">
-                  <h3 className="font-display text-2xl font-medium">{tier.name}</h3>
-                  <p className="text-xs text-muted-foreground min-h-[32px]">{tier.desc}</p>
-                </div>
-                <div className="flex items-baseline gap-1 py-2">
-                  <span className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
-                    {tier.price}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {tier.name === "Enterprise" ? "start" : "one-off"}
-                  </span>
-                </div>
-                <div className="border-t border-border/20 pt-4 space-y-3.5">
-                  <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground block">
-                    What's Included
-                  </span>
-                  <ul className="space-y-2.5">
-                    {tier.features.map((f) => (
-                      <li
-                        key={f}
-                        className="flex items-start gap-2.5 text-xs text-muted-foreground"
-                      >
-                        <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-              <div className="pt-8">
-                <Link
-                  href={`/build?preset=${tier.name.toLowerCase()}`}
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-border text-foreground hover:bg-surface py-3 text-xs font-semibold transition-all"
-                >
-                  Configure Plan <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-            </motion.div>
-          ))}
+              Mobile Apps
+            </button>
+          </div>
+        </div>
 
-          {/* Tripwire offer card */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.5, ease: EASE }}
-            className="relative flex flex-col justify-between p-6 sm:p-8 rounded-3xl border border-primary/20 bg-primary/5"
-          >
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <span className="text-[9px] uppercase tracking-widest text-primary font-bold block">
-                  Entry Offer
-                </span>
-                <h3 className="font-display text-2xl font-medium">Tripwire Audit</h3>
-                <p className="text-xs text-muted-foreground">
-                  A comprehensive audit to identify leaks, bottleneck issues, and improvements.
-                </p>
-              </div>
-              <div className="flex items-baseline gap-1 py-2">
-                <span className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
-                  $99
-                </span>
-                <span className="text-xs text-muted-foreground">one-off</span>
-              </div>
-              <div className="border-t border-border/20 pt-4 space-y-3.5">
-                <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground block">
-                  Included Audits
-                </span>
-                <ul className="space-y-2.5">
-                  {[
-                    "Comprehensive Website Audit",
-                    "Sales Funnel Leak Analysis",
-                    "CRM Operations Checkup",
-                    "Figma UX/UI Review",
-                    "Complete Sales System Assessment",
-                  ].map((f) => (
-                    <li key={f} className="flex items-start gap-2.5 text-xs text-muted-foreground">
-                      <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <div className="pt-8">
-              <Link
-                href="/build?preset=tripwire"
-                className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-border text-foreground hover:bg-surface py-3 text-xs font-semibold transition-all"
+        {/* Pricing Cards Grid */}
+        <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 pt-2">
+          {activePlatform === "web" ? (
+            <>
+              {/* Web Starter, Standard, Growth Tiers */}
+              {TIERS.slice(0, 3).map((tier, idx) => (
+                <motion.div
+                  key={tier.name}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: idx * 0.1, ease: EASE }}
+                  className={`relative flex flex-col justify-between p-6 sm:p-8 rounded-3xl border transition-all ${
+                    tier.popular
+                      ? "bg-card border-primary/50 shadow-xl shadow-primary/5 md:scale-[1.03]"
+                      : "bg-card/60 border-border/60"
+                  }`}
+                >
+                  {tier.popular && (
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-primary-foreground/10">
+                      Most Popular
+                    </div>
+                  )}
+                  <div className="space-y-4">
+                    <div className="space-y-1">
+                      <h3 className="font-display text-2xl font-medium">{tier.name}</h3>
+                      <p className="text-xs text-muted-foreground min-h-[32px]">{tier.desc}</p>
+                    </div>
+                    <div className="flex items-baseline gap-1 py-2">
+                      <span className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
+                        {tier.price}
+                      </span>
+                      <span className="text-xs text-muted-foreground">one-off</span>
+                    </div>
+                    <div className="border-t border-border/20 pt-4 space-y-3.5">
+                      <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground block">
+                        What's Included
+                      </span>
+                      <ul className="space-y-2.5">
+                        {tier.features.map((f) => (
+                          <li
+                            key={f}
+                            className="flex items-start gap-2.5 text-xs text-muted-foreground"
+                          >
+                            <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                            <span>{f}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="pt-8">
+                    <Link
+                      href={`/build?preset=${tier.name.toLowerCase()}`}
+                      className={`w-full inline-flex items-center justify-center gap-2 rounded-xl py-3 text-xs font-semibold transition-all ${
+                        tier.popular
+                          ? "text-primary-foreground glow-primary"
+                          : "border border-border text-foreground hover:bg-surface"
+                      }`}
+                      style={tier.popular ? { background: "var(--gradient-primary)" } : undefined}
+                    >
+                      Configure Plan <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+                </motion.div>
+              ))}
+
+              {/* Web Professional and Enterprise Tiers */}
+              {TIERS.slice(3).map((tier, idx) => (
+                <motion.div
+                  key={tier.name}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: (idx + 3) * 0.1, ease: EASE }}
+                  className="relative flex flex-col justify-between p-6 sm:p-8 rounded-3xl border bg-card/60 border-border/60 lg:col-span-1"
+                >
+                  <div className="space-y-4">
+                    <div className="space-y-1">
+                      <h3 className="font-display text-2xl font-medium">{tier.name}</h3>
+                      <p className="text-xs text-muted-foreground min-h-[32px]">{tier.desc}</p>
+                    </div>
+                    <div className="flex items-baseline gap-1 py-2">
+                      <span className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
+                        {tier.price}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {tier.name === "Enterprise" ? "start" : "one-off"}
+                      </span>
+                    </div>
+                    <div className="border-t border-border/20 pt-4 space-y-3.5">
+                      <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground block">
+                        What's Included
+                      </span>
+                      <ul className="space-y-2.5">
+                        {tier.features.map((f) => (
+                          <li
+                            key={f}
+                            className="flex items-start gap-2.5 text-xs text-muted-foreground"
+                          >
+                            <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                            <span>{f}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="pt-8">
+                    <Link
+                      href={`/build?preset=${tier.name.toLowerCase()}`}
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-border text-foreground hover:bg-surface py-3 text-xs font-semibold transition-all"
+                    >
+                      Configure Plan <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+                </motion.div>
+              ))}
+
+              {/* Tripwire Web Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.5, ease: EASE }}
+                className="relative flex flex-col justify-between p-6 sm:p-8 rounded-3xl border border-primary/20 bg-primary/5"
               >
-                Order Audit <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
-          </motion.div>
+                <div className="space-y-4">
+                  <div className="space-y-1">
+                    <span className="text-[9px] uppercase tracking-widest text-primary font-bold block">
+                      Entry Offer
+                    </span>
+                    <h3 className="font-display text-2xl font-medium">Tripwire Audit</h3>
+                    <p className="text-xs text-muted-foreground">
+                      A comprehensive audit to identify leaks, bottleneck issues, and improvements.
+                    </p>
+                  </div>
+                  <div className="flex items-baseline gap-1 py-2">
+                    <span className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
+                      $99
+                    </span>
+                    <span className="text-xs text-muted-foreground">one-off</span>
+                  </div>
+                  <div className="border-t border-border/20 pt-4 space-y-3.5">
+                    <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground block">
+                      Included Audits
+                    </span>
+                    <ul className="space-y-2.5">
+                      {[
+                        "Comprehensive Website Audit",
+                        "Sales Funnel Leak Analysis",
+                        "CRM Operations Checkup",
+                        "Figma UX/UI Review",
+                        "Complete Sales System Assessment",
+                      ].map((f) => (
+                        <li
+                          key={f}
+                          className="flex items-start gap-2.5 text-xs text-muted-foreground"
+                        >
+                          <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                          <span>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                <div className="pt-8">
+                  <Link
+                    href="/build?preset=tripwire"
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-border text-foreground hover:bg-surface py-3 text-xs font-semibold transition-all"
+                  >
+                    Order Audit <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              </motion.div>
+            </>
+          ) : (
+            <>
+              {/* Mobile Apps Tiers */}
+              {MOBILE_TIERS.map((tier, idx) => (
+                <motion.div
+                  key={tier.name}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: idx * 0.1, ease: EASE }}
+                  className={`relative flex flex-col justify-between p-6 sm:p-8 rounded-3xl border transition-all ${
+                    tier.popular
+                      ? "bg-card border-primary/50 shadow-xl shadow-primary/5 md:scale-[1.03]"
+                      : "bg-card/60 border-border/60"
+                  }`}
+                >
+                  {tier.popular && (
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-primary-foreground/10">
+                      Most Popular
+                    </div>
+                  )}
+                  <div className="space-y-4">
+                    <div className="space-y-1">
+                      <h3 className="font-display text-2xl font-medium">{tier.name}</h3>
+                      <p className="text-xs text-muted-foreground min-h-[32px]">{tier.desc}</p>
+                    </div>
+                    <div className="flex items-baseline gap-1 py-2">
+                      <span className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
+                        {tier.price}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {tier.name === "Enterprise Mobile" ? "start" : "one-off"}
+                      </span>
+                    </div>
+                    <div className="border-t border-border/20 pt-4 space-y-3.5">
+                      <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground block">
+                        What's Included
+                      </span>
+                      <ul className="space-y-2.5">
+                        {tier.features.map((f) => (
+                          <li
+                            key={f}
+                            className="flex items-start gap-2.5 text-xs text-muted-foreground"
+                          >
+                            <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                            <span>{f}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="pt-8">
+                    <Link
+                      href={
+                        tier.name === "Starter Mobile"
+                          ? "/build?preset=starter-mobile"
+                          : tier.name === "Standard Mobile"
+                            ? "/build?preset=standard-mobile"
+                            : "/build"
+                      }
+                      className={`w-full inline-flex items-center justify-center gap-2 rounded-xl py-3 text-xs font-semibold transition-all ${
+                        tier.popular
+                          ? "text-primary-foreground glow-primary"
+                          : "border border-border text-foreground hover:bg-surface"
+                      }`}
+                      style={tier.popular ? { background: "var(--gradient-primary)" } : undefined}
+                    >
+                      Configure Plan <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+                </motion.div>
+              ))}
+            </>
+          )}
         </section>
 
         {/* Dynamic tabs for Add-ons, Upgrades and Care Plans */}
