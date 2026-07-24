@@ -8,8 +8,7 @@ import { useTheme } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 // Team member portraits logos
-import logoBlue from "@/assets/logo-blue.png";
-// import logoGold from "@/assets/logo-gold.png"; // gold disabled
+import logoNavbar from "@/assets/logo-navbar.png";
 
 // Project assets
 import projectPrimaPlug from "@/assets/projects/prima-plug.jpeg";
@@ -89,8 +88,7 @@ export default function PortfolioPage() {
   const [selected, setSelected] = useState<Category>("All");
   const { theme } = useTheme();
 
-  // Gold disabled — always use blue logo
-  const logoSrc = logoBlue.src;
+  const logoSrc = logoNavbar.src;
 
   const filteredProjects =
     selected === "All" ? PROJECTS : PROJECTS.filter((p) => p.categories.includes(selected));
@@ -151,10 +149,11 @@ export default function PortfolioPage() {
               <button
                 key={cat}
                 onClick={() => setSelected(cat)}
-                className={`px-5 py-2 text-xs uppercase tracking-widest font-semibold rounded-full border transition-all ${active
-                  ? "bg-primary border-primary text-primary-foreground shadow-md"
-                  : "border-border/60 hover:border-primary/50 text-muted-foreground hover:text-foreground"
-                  }`}
+                className={`px-5 py-2 text-xs uppercase tracking-widest font-semibold rounded-full border transition-all ${
+                  active
+                    ? "bg-primary border-primary text-primary-foreground shadow-md"
+                    : "border-border/60 hover:border-primary/50 text-muted-foreground hover:text-foreground"
+                }`}
               >
                 {cat}
               </button>
