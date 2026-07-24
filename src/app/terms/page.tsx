@@ -5,20 +5,15 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Mail, Phone, MapPin, Linkedin, Twitter, Facebook } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
-import logoBlue from "@/assets/logo-blue.png";
-// import logoGold from "@/assets/logo-gold.png"; // gold disabled
-import heroBlue from "@/assets/aiventra-logo-blue.png";
-import heroBlueLight from "@/assets/aiventra-logo-blue-light.png";
+import logoNavbar from "@/assets/logo-navbar.png";
+import logoFooter from "@/assets/logo-footer.png";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 export default function TermsAndConditions() {
   const { theme } = useTheme();
-  const logoSrc = logoBlue.src; // gold disabled
-  const footerSrc = theme === "light" ? heroBlueLight.src : logoBlue.src;
-
-  const footerLogoClass =
-    theme === "light" ? "h-22 md:h-25 w-auto object-contain" : "h-16 md:h-18 w-auto object-contain";
+  const logoSrc = logoNavbar.src;
+  const footerSrc = logoFooter.src;
 
   return (
     <div className="min-h-screen bg-background text-foreground relative pb-12 overflow-x-hidden">
@@ -159,7 +154,11 @@ export default function TermsAndConditions() {
       <footer className="border-t border-border mt-20">
         <div className="container-page py-14 grid gap-10 md:grid-cols-4">
           <div className="md:col-span-2 space-y-4">
-            <img src={footerSrc} alt="Aiventra Studios" className={footerLogoClass} />
+            <img
+              src={footerSrc}
+              alt="Aiventra Studios"
+              className="h-9 sm:h-10 md:h-11 w-auto object-contain -ml-1"
+            />
             <p className="text-sm text-muted-foreground max-w-sm pt-2">
               Build. Innovate. Elevate. A studio of senior engineers and designers shipping
               world-class software.
