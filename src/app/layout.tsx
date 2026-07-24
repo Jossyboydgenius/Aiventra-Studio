@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   title: "Aiventra Studio — Build • Innovate • Elevate",
   description:
     "Aiventra Studio is a tech development team building websites, SaaS, mobile & desktop apps, Unity games and AI automation.",
+  icons: {
+    icon: "/favicon.ico",
+  },
   openGraph: {
     title: "Aiventra Studio — Build • Innovate • Elevate",
     description:
