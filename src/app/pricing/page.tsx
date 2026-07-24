@@ -19,8 +19,8 @@ import {
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
-import logoBlue from "@/assets/logo-blue.png";
-import heroBlueLight from "@/assets/aiventra-logo-blue-light.png";
+import logoNavbar from "@/assets/logo-navbar.png";
+import logoFooter from "@/assets/logo-footer.png";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -149,10 +149,8 @@ export default function PricingPage() {
   const [activePlatform, setActivePlatform] = useState<"web" | "mobile">("web");
   const [activeTab, setActiveTab] = useState<"cross-sell" | "upsell" | "recurring">("cross-sell");
 
-  const logoSrc = logoBlue.src;
-  const footerSrc = theme === "light" ? heroBlueLight.src : logoBlue.src;
-  const footerLogoClass =
-    theme === "light" ? "h-22 md:h-25 w-auto object-contain" : "h-16 md:h-18 w-auto object-contain";
+  const logoSrc = logoNavbar.src;
+  const footerSrc = logoFooter.src;
 
   return (
     <div className="min-h-screen bg-background text-foreground relative pb-12 overflow-x-hidden">
@@ -168,7 +166,7 @@ export default function PricingPage() {
         className="fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-5xl z-45 rounded-2xl border border-border/40 bg-card/65 shadow-md backdrop-blur-xl px-4 py-3 flex items-center justify-between"
       >
         <Link href="/" className="flex items-center gap-2.5">
-          <img src={logoSrc} alt="Aiventra Studio" className="h-8 md:h-9 w-auto object-contain" />
+          <img src={logoSrc} alt="Aiventra Studio" className="h-9 md:h-10 w-auto object-contain" />
           <span className="font-display font-medium text-lg hidden sm:inline">Aiventra Studio</span>
         </Link>
         <div className="flex items-center gap-3">
@@ -734,7 +732,11 @@ export default function PricingPage() {
       <footer className="border-t border-border mt-20">
         <div className="container-page py-14 grid gap-10 md:grid-cols-4">
           <div className="md:col-span-2 space-y-4">
-            <img src={footerSrc} alt="Aiventra Studios" className={footerLogoClass} />
+            <img
+              src={footerSrc}
+              alt="Aiventra Studios"
+              className="h-9 sm:h-10 md:h-11 w-auto object-contain -ml-1"
+            />
             <p className="text-sm text-muted-foreground max-w-sm pt-2">
               Build. Innovate. Elevate. A studio of senior engineers and designers shipping
               world-class software.
