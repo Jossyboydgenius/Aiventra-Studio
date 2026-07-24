@@ -11,12 +11,9 @@ import {
   animate,
   AnimatePresence,
 } from "framer-motion";
-import logoDefault from "@/assets/logo.png";
-import logoBlue from "@/assets/logo-blue.png";
-import logoGold from "@/assets/logo-gold.png";
-import heroBlue from "@/assets/aiventra-logo-blue.png";
-import heroBlueLight from "@/assets/aiventra-logo-blue-light.png";
-import heroGold from "@/assets/aiventra-logo-gold.png";
+import logoNavbar from "@/assets/logo-navbar.png";
+import logoHero from "@/assets/logo-hero.png";
+import logoFooter from "@/assets/logo-footer.png";
 
 // Renamed cell assets (for later use)
 import cellWa from "@/assets/cell-wa.png";
@@ -33,6 +30,7 @@ import teamComfort from "@/assets/Comfort.jpeg";
 import teamEnoch from "@/assets/Enoch.jpeg";
 import teamShayor from "@/assets/Shayor.jpeg";
 import teamFemi from "@/assets/Femi.jpeg";
+import teamDaniel from "@/assets/Daniel.jpg";
 
 // Projects assets
 import projectPrimaPlug from "@/assets/projects/prima-plug.jpeg";
@@ -116,12 +114,13 @@ const NAV = [
 ];
 
 function Logo() {
-  const { theme } = useTheme();
-
-  // Gold disabled — always use blue logo
-  const src = logoBlue.src;
-
-  return <img src={src} alt="Aiventra Studios" className="h-9 md:h-10 w-auto object-contain" />;
+  return (
+    <img
+      src={logoNavbar.src}
+      alt="Aiventra Studios"
+      className="h-9 md:h-10 w-auto object-contain"
+    />
+  );
 }
 
 interface HeroLogoProps {
@@ -129,15 +128,16 @@ interface HeroLogoProps {
 }
 
 function HeroLogo({ className }: HeroLogoProps) {
-  const { theme } = useTheme();
-
-  // Gold disabled — light uses heroBlueLight, dark uses heroBlue
-  const src = theme === "light" ? heroBlueLight.src : heroBlue.src;
-
-  const defaultClass =
-    theme === "light" ? "h-16 md:h-20 w-auto object-contain" : "h-38 md:h-42 w-auto object-contain";
-
-  return <img src={src} alt="Aiventra Studios" className={className || defaultClass} />;
+  return (
+    <img
+      src={logoHero.src}
+      alt="Aiventra Studios"
+      className={
+        className ||
+        "h-20 sm:h-24 md:h-28 lg:h-32 w-auto object-contain drop-shadow-xl transition-transform hover:scale-[1.02]"
+      }
+    />
+  );
 }
 
 function Header() {
@@ -166,9 +166,8 @@ function Header() {
       initial={false}
       animate={{ height: open ? "auto" : "64px" }}
       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-      className={`fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-5xl z-50 rounded-2xl border border-border/40 bg-card/65 shadow-lg backdrop-blur-xl md:overflow-visible ${
-        isTransitioning ? "overflow-hidden" : open ? "overflow-visible" : "overflow-hidden"
-      }`}
+      className={`fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-5xl z-50 rounded-2xl border border-border/40 bg-card/65 shadow-lg backdrop-blur-xl md:overflow-visible ${isTransitioning ? "overflow-hidden" : open ? "overflow-visible" : "overflow-hidden"
+        }`}
     >
       <div className="flex h-16 items-center justify-between px-4 py-3">
         <a href="#home" className="flex items-center gap-3">
@@ -202,7 +201,7 @@ function Header() {
           <ThemeToggle />
           <a
             href="#contact"
-            className="hidden md:inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-primary-foreground transition-all hover:opacity-90 whitespace-nowrap"
+            className="hidden md:inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-primary-foreground transition-all hover:opacity-90 whitespace-nowrap animate-gradient-flow"
             style={{ background: "var(--gradient-primary)" }}
           >
             Start a project <ArrowRight className="h-4 w-4" />
@@ -357,6 +356,12 @@ const TEAM = [
     image: teamFemi,
     linkedin: "https://www.linkedin.com/in/awejosepholaitan/",
   },
+  {
+    name: "Daniel",
+    role: "Outsourcing",
+    image: teamDaniel,
+    linkedin: "https://www.linkedin.com/in/adeniji-daniel-754167272",
+  },
 ];
 
 function SectionLabel({ children }: { children: string }) {
@@ -377,11 +382,7 @@ function SectionLabel({ children }: { children: string }) {
 function TeamMemberCard({ member, index }: { member: (typeof TEAM)[number]; index: number }) {
   const [tapped, setTapped] = useState(false);
 
-  // On mobile, tapping reveals the LinkedIn button; tapping again hides it.
-  // On desktop the hover CSS handles it natively.
   const handleTap = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    // Only intercept touch interactions — let pure mouse clicks on LinkedIn
-    // anchor propagate normally.
     const isTouchDevice = window.matchMedia("(hover: none)").matches;
     if (!isTouchDevice) return;
     e.preventDefault();
@@ -392,16 +393,24 @@ function TeamMemberCard({ member, index }: { member: (typeof TEAM)[number]; inde
     <div
       key={`card-${index}`}
       onClick={handleTap}
-      className="relative overflow-hidden rounded-2xl border border-border/30 bg-card flex flex-col justify-end p-6 group aspect-[3/4] w-[220px] sm:w-[260px] shrink-0 select-none cursor-grab active:cursor-grabbing touch-pan-x"
+      className="relative overflow-hidden rounded-2xl border border-border/40 bg-card flex flex-col justify-end p-6 group aspect-[3/4] w-[220px] sm:w-[260px] shrink-0 select-none cursor-grab active:cursor-grabbing touch-pan-x shadow-sm hover:shadow-xl transition-all duration-500"
     >
+      {/* Studio portrait image with duotone tone effect & hover to reveal */}
       <img
         src={member.image.src}
         alt={member.name}
         draggable={false}
-        className="absolute inset-0 h-full w-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out pointer-events-none"
+        className={[
+          "absolute inset-0 h-full w-full object-cover transition-all duration-700 ease-out pointer-events-none",
+          "grayscale contrast-125 brightness-95 opacity-90",
+          "group-hover:grayscale-0 group-hover:contrast-100 group-hover:brightness-100 group-hover:opacity-100 group-hover:scale-105",
+        ].join(" ")}
       />
 
-      {/* LinkedIn icon — visible on hover (desktop) OR when tapped (mobile) */}
+      {/* Miden-style blue duotone tint overlay (fades out on hover to reveal true colors) */}
+      <div className="absolute inset-0 bg-[#004bda]/20 mix-blend-color transition-opacity duration-500 group-hover:opacity-0 pointer-events-none z-10" />
+
+      {/* LinkedIn icon */}
       <a
         href={member.linkedin}
         target="_blank"
@@ -409,9 +418,8 @@ function TeamMemberCard({ member, index }: { member: (typeof TEAM)[number]; inde
         onClick={(e) => e.stopPropagation()}
         aria-label={`View ${member.name} on LinkedIn`}
         className={[
-          "absolute top-4 right-4 z-30 p-2 text-white bg-black/60 border border-white/20 rounded-full",
+          "absolute top-4 right-4 z-30 p-2.5 text-white bg-black/60 border border-white/20 rounded-full",
           "hover:bg-primary transition-all duration-300 shadow-md",
-          // Desktop: shown on group-hover; Mobile: shown when tapped
           tapped
             ? "opacity-100 scale-100"
             : "opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100",
@@ -420,25 +428,20 @@ function TeamMemberCard({ member, index }: { member: (typeof TEAM)[number]; inde
         <Linkedin className="h-4 w-4" />
       </a>
 
-      {/* Bottom gradient vignette */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent pointer-events-none z-10" />
+      {/* Bottom gradient vignette for text contrast */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none z-15" />
 
       {/* Name + role */}
       <div
         className={[
-          "relative z-20 text-center transition-transform duration-500 ease-out",
-          tapped ? "translate-y-0" : "translate-y-3 group-hover:translate-y-0",
+          "relative z-20 text-left transition-transform duration-500 ease-out",
+          tapped ? "translate-y-0" : "translate-y-2 group-hover:translate-y-0",
         ].join(" ")}
       >
-        <h4 className="font-display text-xl font-medium text-white drop-shadow">{member.name}</h4>
-        <p
-          className={[
-            "text-xs text-white/80 font-medium tracking-wide mt-1.5 transition-opacity duration-500",
-            tapped ? "opacity-100" : "opacity-0 group-hover:opacity-100",
-          ].join(" ")}
-        >
-          {member.role}
-        </p>
+        <h4 className="font-display text-xl font-medium text-white drop-shadow-sm">
+          {member.name}
+        </h4>
+        <p className="text-xs text-white/80 font-medium tracking-wide mt-1">{member.role}</p>
       </div>
     </div>
   );
@@ -447,33 +450,26 @@ function TeamMemberCard({ member, index }: { member: (typeof TEAM)[number]; inde
 function TeamMarquee() {
   const trackRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
-  // Accumulated pixel offset (we animate translateX via this)
   const offsetRef = useRef(0);
-  // Auto-scroll speed (px per frame at 60fps)
   const SPEED = 0.5;
-  // Whether the user is actively dragging / touching
-  const isDragging = useRef(false);
-  const lastX = useRef(0);
-  const touchStartX = useRef(0);
-  const touchLastX = useRef(0);
 
-  // Apply the current offset to the DOM element directly (no React re-render
-  // needed — this keeps it smooth).
+  const isMouseDown = useRef(false);
+  const isHovered = useRef(false);
+  const lastX = useRef(0);
+
   const applyOffset = useCallback(() => {
     const el = trackRef.current;
     if (!el) return;
-    // The track contains two identical sets of cards.  We measure the width of
-    // one set (half of scrollWidth) and loop once we've scrolled that far.
     const halfW = el.scrollWidth / 2;
-    // Keep offset in [0, halfW) so the loop is invisible.
+    if (halfW === 0) return;
     offsetRef.current = ((offsetRef.current % halfW) + halfW) % halfW;
     el.style.transform = `translateX(-${offsetRef.current}px)`;
   }, []);
 
-  // Auto-scroll RAF loop
+  // Auto-scroll loop
   useEffect(() => {
     const tick = () => {
-      if (!isDragging.current) {
+      if (!isMouseDown.current && !isHovered.current) {
         offsetRef.current += SPEED;
         applyOffset();
       }
@@ -485,28 +481,32 @@ function TeamMarquee() {
     };
   }, [applyOffset]);
 
-  // ── Mouse drag handlers ──────────────────────────────────────────────────
+  // ── Mouse drag handlers (Hold down left click to drag) ─────────────────────
   const onMouseDown = (e: React.MouseEvent) => {
-    isDragging.current = true;
+    if (e.button !== 0) return;
+    isMouseDown.current = true;
     lastX.current = e.clientX;
-    // Change cursor on the wrapper via class added to body
     document.body.style.cursor = "grabbing";
     document.body.style.userSelect = "none";
   };
 
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
-      if (!isDragging.current) return;
+      if (!isMouseDown.current) return;
       const delta = lastX.current - e.clientX;
       lastX.current = e.clientX;
       offsetRef.current += delta;
       applyOffset();
     };
+
     const onMouseUp = () => {
-      isDragging.current = false;
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
+      if (isMouseDown.current) {
+        isMouseDown.current = false;
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+      }
     };
+
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
     return () => {
@@ -515,34 +515,33 @@ function TeamMarquee() {
     };
   }, [applyOffset]);
 
-  // ── Touch handlers ───────────────────────────────────────────────────────
+  // ── Touch handlers ────────────────────────────────────────────────────────
   const onTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchLastX.current = e.touches[0].clientX;
-    isDragging.current = true;
+    isMouseDown.current = true;
+    lastX.current = e.touches[0].clientX;
   };
 
   const onTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging.current) return;
-    const delta = touchLastX.current - e.touches[0].clientX;
-    touchLastX.current = e.touches[0].clientX;
+    if (!isMouseDown.current) return;
+    const delta = lastX.current - e.touches[0].clientX;
+    lastX.current = e.touches[0].clientX;
     offsetRef.current += delta;
     applyOffset();
   };
 
   const onTouchEnd = () => {
-    isDragging.current = false;
+    isMouseDown.current = false;
   };
 
   return (
     <div
       className="relative w-full overflow-hidden py-4 border-y border-border/20 bg-surface/30"
-      // pause auto-scroll on hover (desktop)
       onMouseEnter={() => {
-        isDragging.current = true;
+        isHovered.current = true;
       }}
       onMouseLeave={() => {
-        isDragging.current = false;
+        isHovered.current = false;
+        isMouseDown.current = false;
       }}
       onMouseDown={onMouseDown}
       onTouchStart={onTouchStart}
@@ -561,17 +560,14 @@ function TeamMarquee() {
         className="flex w-max gap-4 sm:gap-6 px-4 will-change-transform"
         style={{ transform: "translateX(0px)" }}
       >
-        {/* First copy */}
         {TEAM.map((m, i) => (
           <TeamMemberCard key={`a-${i}`} member={m} index={i} />
         ))}
-        {/* Second copy for seamless loop */}
         {TEAM.map((m, i) => (
           <TeamMemberCard key={`b-${i}`} member={m} index={i} />
         ))}
       </div>
 
-      {/* Scroll hint on mobile */}
       <p className="sm:hidden text-center text-[10px] text-muted-foreground/50 mt-2 pointer-events-none">
         Swipe to explore · Tap a card to see LinkedIn
       </p>
@@ -1129,11 +1125,10 @@ function Testimonials() {
                 key={idx}
                 onClick={() => setActiveIndex(idx)}
                 aria-label={`Go to testimonial ${idx + 1}`}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  activeIndex === idx
+                className={`h-2 rounded-full transition-all duration-300 ${activeIndex === idx
                     ? "w-6 bg-primary"
                     : "w-2 bg-muted hover:bg-muted-foreground/30"
-                }`}
+                  }`}
               />
             ))}
           </div>
@@ -1284,7 +1279,8 @@ function Contact() {
                 <MapPin className="h-4 w-4 text-primary" /> Remote
               </div>
               <button
-                data-cal-link="techapostle/30min"
+                data-cal-link="aiventra-studio/30min"
+                data-cal-namespace="30min"
                 data-cal-config='{"layout":"month_view"}'
                 className="flex items-center gap-3 text-sm text-primary hover:opacity-80 transition-opacity font-semibold cursor-pointer pt-2"
               >
@@ -1537,19 +1533,15 @@ function CtaBanner() {
 }
 
 function Footer() {
-  const { theme } = useTheme();
-
-  // Gold disabled — light uses hero banner, dark uses blue logo
-  const footerSrc = theme === "light" ? heroBlueLight.src : logoBlue.src;
-
-  const footerLogoClass =
-    theme === "light" ? "h-22 md:h-25 w-auto object-contain" : "h-16 md:h-18 w-auto object-contain";
-
   return (
     <footer className="border-t border-border mt-20">
       <div className="container-page py-14 grid gap-10 md:grid-cols-4">
         <div className="md:col-span-2 space-y-4">
-          <img src={footerSrc} alt="Aiventra Studios" className={footerLogoClass} />
+          <img
+            src={logoFooter.src}
+            alt="Aiventra Studios"
+            className="h-9 sm:h-10 md:h-11 w-auto object-contain -ml-1"
+          />
           <p className="text-sm text-muted-foreground max-w-sm pt-2">
             Build. Innovate. Elevate. A studio of senior engineers and designers shipping
             world-class software.
