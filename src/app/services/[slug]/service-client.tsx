@@ -27,8 +27,7 @@ import cellAi from "@/assets/cell-ai.png";
 import cellGs from "@/assets/cell-gs.png";
 import cellMa from "@/assets/cell-ma.png";
 
-// Team member portraits logos
-import logoBlue from "@/assets/logo-blue.png";
+import logoNavbar from "@/assets/logo-navbar.png";
 // import logoGold from "@/assets/logo-gold.png"; // gold disabled
 
 // Project assets
@@ -275,8 +274,7 @@ export default function ServiceClient({ slug }: { slug: string }) {
   const data = SERVICES_DETAILS[slug];
   const { theme } = useTheme();
 
-  // Gold disabled — always use blue logo
-  const logoSrc = logoBlue.src;
+  const logoSrc = logoNavbar.src;
 
   if (!data) {
     return (
